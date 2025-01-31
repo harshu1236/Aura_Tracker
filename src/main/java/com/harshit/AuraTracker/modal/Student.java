@@ -3,6 +3,8 @@ package com.harshit.AuraTracker.modal;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table
@@ -13,9 +15,10 @@ public class Student {
     private int student_Id;
 
     private String student_Name;
-    private String course;
     private String reg_No;
     private String Password;
+    @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
+    private List<Course> course;
 
     public int getStudent_Id() {
         return student_Id;
@@ -33,12 +36,12 @@ public class Student {
         this.student_Name = student_Name;
     }
 
-    public String getCourse() {
+    public List<Course> getCourses() {
         return course;
     }
 
-    public void setCourse(String course) {
-        this.course = course;
+    public void setCourses(List<Course> courses) {
+        this.course = courses;
     }
 
     public String getReg_No() {

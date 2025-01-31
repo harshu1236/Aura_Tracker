@@ -5,6 +5,7 @@ import com.harshit.AuraTracker.modal.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +20,7 @@ public class StudentServiceImpl implements StudentService{
         Student saved = studentRepository.save(student);
         System.out.println("saved student "+saved.getStudent_Id());
         System.out.println("saved student "+saved.getStudent_Name());
-        System.out.println("saved student "+saved.getCourse());
+        System.out.println("saved student "+saved.getCourses());
         System.out.println("saved student "+saved.getPassword());
         System.out.println("saved student "+saved.getReg_No());
         return saved;
@@ -32,5 +33,10 @@ public class StudentServiceImpl implements StudentService{
             return studentRepository.findById(id);
         }
         return null;
+    }
+
+    @Override
+    public List<Student> getAllStudent() {
+        return studentRepository.findAll();
     }
 }
