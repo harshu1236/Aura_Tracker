@@ -14,9 +14,14 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int student_Id;
 
+    @Column(nullable = false)
     private String student_Name;
+
+    @Column(name = "reg_No")
     private String reg_No;
+    
     private String Password;
+    private String role="STUDENT";
     @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<Course> course;
 
