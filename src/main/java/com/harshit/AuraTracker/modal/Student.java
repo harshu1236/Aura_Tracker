@@ -2,6 +2,7 @@ package com.harshit.AuraTracker.modal;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
@@ -17,10 +18,10 @@ public class Student {
     @Column(nullable = false)
     private String student_Name;
 
-    @Column(name = "reg_No")
-    private String reg_No;
+    @Column(name = "regNo")
+    private String regNo;
     
-    private String Password;
+    private String password;
     private String role="STUDENT";
     @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<Course> course;
@@ -49,19 +50,20 @@ public class Student {
         this.course = courses;
     }
 
-    public String getReg_No() {
-        return reg_No;
+    public String getRegNo() {
+        return regNo;
     }
 
-    public void setReg_No(String reg_No) {
-        this.reg_No = reg_No;
+    public void setRegNo(String regNo) {
+        this.regNo = regNo;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     public void setPassword(String password) {
-        Password = password;
+        BCryptPasswordEncoder encoder=new BCryptPasswordEncoder();
+        this.password=encoder.encode(password);
     }
 }

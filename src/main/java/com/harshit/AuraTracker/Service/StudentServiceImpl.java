@@ -22,7 +22,7 @@ public class StudentServiceImpl implements StudentService{
         System.out.println("saved student "+saved.getStudent_Name());
         System.out.println("saved student "+saved.getCourses());
         System.out.println("saved student "+saved.getPassword());
-        System.out.println("saved student "+saved.getReg_No());
+        System.out.println("saved student "+saved.getRegNo());
         return saved;
     }
 

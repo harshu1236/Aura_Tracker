@@ -13,14 +13,19 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private String secretKey = "secret";
+    private String secretKey = "myverysecureandlongsecretkeyforjwt";
+
+    private Key getSigningKey()
+    {
+        return Keys.hmacShaKeyFor((secretKey.getBytes(StandardCharsets.UTF_8)));
+    }
 
     public String generateToken(String regNo) {
         return Jwts.builder()
                 .setSubject(regNo)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour expiration
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
     public String extractRegNo(String token) {
@@ -32,12 +37,10 @@ public class JwtUtil {
     }
 
     private Claims getClaims(String token) {
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        Jws<Claims> claimsJws = Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJws(token);
-
-        return claimsJws.getBody();
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
