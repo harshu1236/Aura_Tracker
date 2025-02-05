@@ -63,7 +63,8 @@ public class Student {
     }
 
     public void setPassword(String password) {
-        BCryptPasswordEncoder encoder=new BCryptPasswordEncoder();
-        this.password=encoder.encode(password);
+
+        this.password=password;
+
     }
 }

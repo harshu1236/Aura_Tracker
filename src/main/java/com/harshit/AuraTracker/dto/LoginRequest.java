@@ -4,15 +4,15 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    private String reg_No;
+    private String regNo;
     private String password;
 
-    public String getReg_No() {
-        return reg_No;
+    public String getRegNo() {
+        return regNo;
     }
 
-    public void setReg_No(String reg_No) {
-        this.reg_No = reg_No;
+    public void setRegNo(String regNo) {
+        this.regNo = regNo;
     }
 
     public String getPassword() {
@@ -23,3 +23,4 @@ public class LoginRequest {
         this.password = password;
     }
 }
+

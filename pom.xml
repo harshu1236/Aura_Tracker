@@ -44,6 +44,8 @@
 			<artifactId>spring-security-core</artifactId>
 			<version>6.4.2</version>
 		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
