@@ -18,7 +18,7 @@ public class StudentServiceImpl implements StudentService{
     public Student createStudent(Student student) {
 
         Student saved = studentRepository.save(student);
-        System.out.println("saved student "+saved.getStudent_Id());
+        System.out.println("saved student "+saved.getStudentId());
         System.out.println("saved student "+saved.getStudent_Name());
         System.out.println("saved student "+saved.getCourses());
         System.out.println("saved student "+saved.getPassword());

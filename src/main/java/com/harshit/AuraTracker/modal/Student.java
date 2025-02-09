@@ -2,7 +2,6 @@ package com.harshit.AuraTracker.modal;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int student_Id;
+    private int studentId;
 
     @Column(nullable = false)
     private String student_Name;
@@ -26,12 +25,38 @@ public class Student {
     @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
     private List<Course> course;
 
-    public int getStudent_Id() {
-        return student_Id;
+    private int points;
+
+    public String getRole() {
+        return role;
     }
 
-    public void setStudent_Id(int student_Id) {
-        this.student_Id = student_Id;
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public List<Course> getCourse() {
+        return course;
+    }
+
+    public void setCourse(List<Course> course) {
+        this.course = course;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public int getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
     public String getStudent_Name() {
