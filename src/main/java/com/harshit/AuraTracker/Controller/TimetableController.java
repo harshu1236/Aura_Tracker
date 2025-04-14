@@ -1,8 +1,10 @@
 package com.harshit.AuraTracker.Controller;
 
+
 import com.harshit.AuraTracker.Service.TimetableService;
 import com.harshit.AuraTracker.modal.Timetable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

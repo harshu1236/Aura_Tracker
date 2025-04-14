@@ -14,7 +14,7 @@ public class RewardServiceImpl implements RewardService{
     private RewardRepository rewardRepository;
 
     public List<Reward> getRewardsByStudent(Long studentId) {
-        return rewardRepository.findByStudentId(studentId);
+        return rewardRepository.findByStudentStudentId(studentId);
     }
 
     public void unlockReward(Long rewardId) {

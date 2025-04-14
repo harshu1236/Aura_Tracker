@@ -12,10 +12,10 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int studentId;
+    private Long studentId;
 
     @Column(nullable = false)
-    private String student_Name;
+    private String studentName;
 
     @Column(name = "regNo")
     private String regNo;
@@ -51,20 +51,20 @@ public class Student {
         this.points = points;
     }
 
-    public int getStudentId() {
+    public Long getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(int studentId) {
+    public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
 
     public String getStudent_Name() {
-        return student_Name;
+        return studentName;
     }
 
     public void setStudent_Name(String student_Name) {
-        this.student_Name = student_Name;
+        this.studentName = student_Name;
     }
 
     public List<Course> getCourses() {

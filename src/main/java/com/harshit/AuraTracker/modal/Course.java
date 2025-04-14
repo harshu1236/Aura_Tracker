@@ -13,11 +13,11 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String course_Name;
+    private String courseName;
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "studentId")
     private Student student;
 
     @OneToMany(mappedBy = "courses",cascade = CascadeType.ALL)
@@ -31,12 +31,12 @@ public class Course {
         this.id = id;
     }
 
-    public String getCourse_Name() {
-        return course_Name;
+    public String getCourseName() {
+        return courseName;
     }
 
     public void setCourse_Name(String course_Name) {
-        this.course_Name = course_Name;
+        this.courseName = course_Name;
     }
 
     public String getDescription() {

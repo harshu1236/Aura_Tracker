@@ -17,7 +17,7 @@ public class Assignment {
     private LocalDate dueDate;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name = "courseId")
     private Course courses;
 
     public Long getId() {

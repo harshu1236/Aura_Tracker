@@ -27,10 +27,10 @@ public class StudentServiceImpl implements StudentService{
     }
 
     @Override
-    public Optional<Student> getStudentDataById(Integer id) {
-        if (studentRepository.findById(id).isPresent())
+    public Optional<Student> getStudentDataById(Integer studentId) {
+        if (studentRepository.findById(studentId).isPresent())
         {
-            return studentRepository.findById(id);
+            return studentRepository.findById(studentId);
         }
         return null;
     }
