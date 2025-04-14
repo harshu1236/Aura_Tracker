@@ -22,6 +22,9 @@ public class Challenge {
     @JoinColumn(name = "studentId")
     private Student student;
 
+
+
+
     public boolean isCompleted() {
         return completed;
     }

@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,24 +12,25 @@ public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long courseId;
 
     private String courseName;
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "studentId")
+    @JsonIgnore
     private Student student;
 
     @OneToMany(mappedBy = "courses",cascade = CascadeType.ALL)
     private List<Assignment> assignments;
 
     public Long getId() {
-        return id;
+        return courseId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long courseId) {
+        this.courseId = courseId;
     }
 
     public String getCourseName() {

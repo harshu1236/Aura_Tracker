@@ -19,7 +19,7 @@ public class Student {
 
     @Column(name = "regNo")
     private String regNo;
-    
+
     private String password;
     private String role="STUDENT";
     @OneToMany(mappedBy = "student",cascade = CascadeType.ALL)
