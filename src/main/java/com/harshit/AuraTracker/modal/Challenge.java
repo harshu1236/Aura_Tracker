@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,8 +23,13 @@ public class Challenge {
     @JoinColumn(name = "studentId")
     private Student student;
 
+    public Student getStudent() {
+        return student;
+    }
 
-
+    public void setStudent(Student student) {
+        this.student = student;
+    }
 
     public boolean isCompleted() {
         return completed;

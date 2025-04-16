@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,6 +18,7 @@ public class Chapter {
 
     @ManyToOne
     @JoinColumn(name = "courseId")
+    @JsonIgnore
     private Course course;
 
     public String getTitle() {

@@ -24,4 +24,9 @@ public class RewardController {
         rewardService.unlockReward(rewardId);
         return "Reward unlocked successfully!";
     }
+
+    @PostMapping("/create")
+    public Reward createReward(@RequestBody Reward reward) {
+        return rewardService.createReward(reward);
+    }
 }
