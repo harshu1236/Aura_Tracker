@@ -1,0 +1,9 @@
+{
+  "short_name": "Aura Tracker",
+  "name": "Aura Tracker Learning Management System",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

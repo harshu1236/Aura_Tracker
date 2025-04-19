@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ public class Student {
     private Long studentId;
 
     @Column(nullable = false)
+    @JsonProperty("studentName")
     private String studentName;
 
     @Column(name = "regNo")

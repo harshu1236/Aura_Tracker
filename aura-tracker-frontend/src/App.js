@@ -1,0 +1,60 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material';
+import Home from './components/home/Home';
+
+import Navbar from './components/layout/Navbar';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
+import Dashboard from './components/dashboard/Dashboard';
+import TimetableList from './components/timetable/TimetableList';
+import TimetableForm from './components/timetable/TimetableForm';
+import RewardList from './components/rewards/RewardList';
+import Leaderboard from './components/leaderboard/Leaderboard';
+import StudentProfile from './components/student/StudentProfile';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+});
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<Login />} />
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/home" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<StudentProfile />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/timetable" element={<TimetableList />} />
+              <Route path="/timetable/add" element={<TimetableForm />} />
+              <Route path="/rewards" element={<RewardList />} />
+            </Route>
+          </Routes>
+        </div>
+      </Router>
+    </ThemeProvider>
+  );
+}
+
+export default App;

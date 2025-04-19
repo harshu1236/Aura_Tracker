@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private String secretKey = "myverysecureandlongsecretkeyforjwt";
+    private String secretKey = "9Dkfl8h38@Vns93!nfi38cnQ94fnV3mcnA47vNfi29@cnvXfi93vMCn39vncXfi";
 
     private Key getSigningKey()
     {

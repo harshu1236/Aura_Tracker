@@ -1,6 +1,6 @@
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+!target/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -14,11 +14,11 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+Backend/.idea
 *.iws
 *.iml
 *.ipr
-
+node_modules/
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
