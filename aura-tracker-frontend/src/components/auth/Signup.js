@@ -1,4 +1,3 @@
-// src/components/auth/Signup.js
 import { useState } from 'react';
 import { TextField, Button, Container, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -25,9 +24,9 @@ function Signup() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
-        <Typography variant="h4" gutterBottom>
+    <Container maxWidth="sm" className="mt-20">
+      <Paper className="p-8 shadow-xl rounded-xl bg-white">
+        <Typography variant="h4" className="text-center mb-6 font-semibold text-blue-600">
           Signup
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -37,6 +36,7 @@ function Signup() {
             margin="normal"
             value={student.regNo}
             onChange={(e) => setStudent({ ...student, regNo: e.target.value })}
+            className="mb-4"
           />
           <TextField
             fullWidth
@@ -44,6 +44,7 @@ function Signup() {
             margin="normal"
             value={student.studentName}
             onChange={(e) => setStudent({ ...student, studentName: e.target.value })}
+            className="mb-4"
           />
           <TextField
             fullWidth
@@ -52,13 +53,14 @@ function Signup() {
             margin="normal"
             value={student.password}
             onChange={(e) => setStudent({ ...student, password: e.target.value })}
+            className="mb-6"
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 3 }}
+            className="mt-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
           >
             Signup
           </Button>
