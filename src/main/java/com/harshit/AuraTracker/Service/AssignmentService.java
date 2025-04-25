@@ -7,4 +7,6 @@ import java.util.List;
 public interface AssignmentService {
     public List<Assignment> getAllAssignment();
     public Assignment createAssignment(Assignment assignment,Long courseId) throws Exception;
+    List<Assignment> getAssignmentsByCourseId(Long courseId);
+
 }

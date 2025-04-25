@@ -30,4 +30,10 @@ public class AssignmentController {
         return assignment1;
     }
 
+    @GetMapping("/course/{courseId}")
+    public List<Assignment> getAssignmentsByCourse(@PathVariable Long courseId) {
+        return assignmentService.getAssignmentsByCourseId(courseId);
+    }
+
+
 }

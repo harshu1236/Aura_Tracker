@@ -24,8 +24,11 @@ function Navbar() {
             <Button color="inherit" component={Link} to="/home">
               Home
             </Button>
-            <Button color="inherit" component={Link} to="/dashboard">
-              Dashboard
+            <Button color="inherit" component={Link} to="/courses">
+              Course
+            </Button>
+            <Button color="inherit" component={Link} to="/assignments">
+              Assignment
             </Button>
             <Button color="inherit" component={Link} to="/leaderboard">
               Leaderboard

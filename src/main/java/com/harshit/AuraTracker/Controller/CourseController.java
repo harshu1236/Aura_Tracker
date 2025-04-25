@@ -30,4 +30,9 @@ public class CourseController {
         return course1;
     }
 
+    @GetMapping("/student/{studentId}")
+    public List<Course> getCoursesByStudent(@PathVariable int studentId) throws Exception {
+        return courseService.getCoursebyStudentId(studentId);
+    }
+
 }

@@ -38,4 +38,9 @@ public class AssignmentServiceImpl implements AssignmentService{
             throw new Exception("course not found with id "+courseId);
         }
     }
+
+    @Override
+    public List<Assignment> getAssignmentsByCourseId(Long courseId) {
+        return assignmentRepository.findByCourses_CourseId(courseId);
+    }
 }

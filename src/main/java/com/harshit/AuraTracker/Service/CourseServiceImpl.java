@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CourseServiceImpl implements CourseService{
+public class CourseServiceImpl implements CourseService {
 
     @Autowired
     CourseRepository courseRepository;
@@ -25,17 +25,23 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public Course createCourse(Course course,int studentId) throws Exception {
-        System.out.println(studentId);
+    public Course createCourse(Course course, int studentId) throws Exception {
         Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isPresent())
-        {
-            Student student1=student.get();
-            course.setStudent(student1);
+        if (student.isPresent()) {
+            course.setStudent(student.get());
             return courseRepository.save(course);
+        } else {
+            throw new Exception("Student not found with id " + studentId);
         }
-        else {
-            throw new Exception("Student not found with id "+studentId);
+    }
+
+    @Override
+    public List<Course> getCoursebyStudentId(int studentId) throws Exception {
+        Optional<Student> student = studentRepository.findById(studentId);
+        if (student.isPresent()) {
+            return courseRepository.findByStudent_StudentId((long) studentId);
+        } else {
+            throw new Exception("Student not found with id " + studentId);
         }
     }
 }

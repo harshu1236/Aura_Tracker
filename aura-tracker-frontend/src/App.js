@@ -7,12 +7,16 @@ import Navbar from './components/layout/Navbar';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
-import Dashboard from './components/dashboard/Dashboard';
 import TimetableList from './components/timetable/TimetableList';
 import TimetableForm from './components/timetable/TimetableForm';
 import RewardList from './components/rewards/RewardList';
 import Leaderboard from './components/leaderboard/Leaderboard';
 import StudentProfile from './components/student/StudentProfile';
+import CoursePage from './components/course/CoursePage';
+import Assignment from './components/assignment/Assignment';
+
+// ✅ Add this when you create AssignmentPage
+// import AssignmentPage from './components/assignment/AssignmentPage';
 
 const theme = createTheme({
   palette: {
@@ -43,12 +47,14 @@ function App() {
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/home" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/courses" element={<CoursePage />} />
               <Route path="/profile" element={<StudentProfile />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/timetable" element={<TimetableList />} />
               <Route path="/timetable/add" element={<TimetableForm />} />
               <Route path="/rewards" element={<RewardList />} />
+              <Route path="/assignments" element={<Assignment />} />
+              {/* <Route path="/assignments" element={<AssignmentPage />} /> */}
             </Route>
           </Routes>
         </div>
