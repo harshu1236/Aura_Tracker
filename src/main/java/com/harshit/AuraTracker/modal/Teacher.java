@@ -21,6 +21,9 @@ public class Teacher {
     @JsonIgnore
     private List<Course> courses;
 
+    public Teacher() {
+    }
+
     public String getName() {
         return name;
     }

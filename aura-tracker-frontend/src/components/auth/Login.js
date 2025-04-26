@@ -1,12 +1,22 @@
-// src/components/auth/Login.js
-import React, { useState } from 'react';
+// src/components/auth/Login.jsx
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
   const navigate = useNavigate();
+  const [role, setRole] = useState('student'); // Default role: student
   const [formData, setFormData] = useState({ regNo: '', password: '' });
   const [error, setError] = useState('');
+
+  // Jab role change ho, form fields reset karo
+  useEffect(() => {
+    if (role === 'student') {
+      setFormData({ regNo: '', password: '' });
+    } else {
+      setFormData({ email: '', password: '' });
+    }
+  }, [role]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,15 +27,16 @@ function Login() {
     setError('');
 
     try {
-      const response = await axios.post(
-        'http://localhost:1211/api/auth/login',
-        formData,
-        { withCredentials: true }
-      );
+      const url =
+        role === 'student'
+          ? 'http://localhost:1211/api/auth/login'
+          : 'http://localhost:1211/auth/teacher/login';
+
+      const response = await axios.post(url, formData, { withCredentials: true });
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.student));
+        localStorage.setItem('user', JSON.stringify(response.data.student || response.data.teacher));
         navigate('/home', { replace: true });
       } else {
         setError(response.data.message || 'Login failed. Please check your credentials.');
@@ -47,21 +58,56 @@ function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Role Selector */}
           <div>
-            <label htmlFor="regNo" className="block text-sm mb-1 text-gray-300">
-              Registration Number
+            <label htmlFor="role" className="block text-sm mb-1 text-gray-300">
+              Select Role
             </label>
-            <input
-              type="text"
-              id="regNo"
-              name="regNo"
-              value={formData.regNo}
-              onChange={handleChange}
-              required
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
               className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            >
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+            </select>
           </div>
 
+          {/* Dynamic Fields */}
+          {role === 'student' ? (
+            <div>
+              <label htmlFor="regNo" className="block text-sm mb-1 text-gray-300">
+                Registration Number
+              </label>
+              <input
+                type="text"
+                id="regNo"
+                name="regNo"
+                value={formData.regNo}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="email" className="block text-sm mb-1 text-gray-300">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          )}
+
+          {/* Common Password Field */}
           <div>
             <label htmlFor="password" className="block text-sm mb-1 text-gray-300">
               Password
@@ -77,6 +123,7 @@ function Login() {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-500 transition duration-200 text-white font-semibold py-2 rounded"
@@ -84,6 +131,7 @@ function Login() {
             Sign In
           </button>
 
+          {/* Redirect to Signup */}
           <button
             type="button"
             onClick={() => navigate('/signup')}

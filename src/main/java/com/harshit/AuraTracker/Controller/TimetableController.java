@@ -25,4 +25,6 @@ public class TimetableController {
     public Timetable addTimetableEntry(@RequestBody Timetable timetable) {
         return timetableService.addTimetableEntry(timetable);
     }
+
+    
 }

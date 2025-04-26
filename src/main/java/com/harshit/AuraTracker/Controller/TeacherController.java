@@ -49,4 +49,9 @@ public class TeacherController {
         return teacherService.getAllTeachers();
     }
 
+    @GetMapping("/{teacherId}")
+    public Teacher getTeacherById(@PathVariable Long teacherId) {
+        return teacherService.getTeacherById(teacherId);
+    }
+
 }
