@@ -27,7 +27,7 @@ const Assignment = () => {
 
       const allAssignments = [];
       for (const course of courseList) {
-        const res = await axios.get(`http://localhost:1211/api/assignments/course/${course.courseId}`, {
+        const res = await axios.get(`http://localhost:1211/api/assignments/course/${course.id}`, { // 🔥 course.id not course.courseId
           headers: { Authorization: `Bearer ${token}` },
         });
         const assignmentsWithCourse = res.data.map((a) => ({
@@ -120,7 +120,7 @@ const Assignment = () => {
           >
             <option value="" disabled>Select Course</option>
             {courses.map((course) => (
-              <option key={course.courseId} value={course.courseId}>
+              <option key={course.id} value={course.id}>
                 {course.courseName}
               </option>
             ))}

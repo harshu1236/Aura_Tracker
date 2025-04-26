@@ -22,6 +22,21 @@ public class Course {
     @JsonIgnore
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "teacherId")
+    private Teacher teacher;
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+
+
+
     @OneToMany(mappedBy = "courses",cascade = CascadeType.ALL)
     private List<Assignment> assignments;
 
