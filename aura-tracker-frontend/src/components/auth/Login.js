@@ -1,15 +1,13 @@
-// src/components/auth/Login.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
   const navigate = useNavigate();
-  const [role, setRole] = useState('student'); // Default role: student
+  const [role, setRole] = useState('student');
   const [formData, setFormData] = useState({ regNo: '', password: '' });
   const [error, setError] = useState('');
 
-  // Jab role change ho, form fields reset karo
   useEffect(() => {
     if (role === 'student') {
       setFormData({ regNo: '', password: '' });
@@ -36,7 +34,13 @@ function Login() {
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.student || response.data.teacher));
+
+        const userData = {
+          ...(response.data.student || response.data.teacher),
+          role: role.toUpperCase()  // 👈 Role bhi save ho raha hai ab
+        };
+
+        localStorage.setItem('user', JSON.stringify(userData));
         navigate('/home', { replace: true });
       } else {
         setError(response.data.message || 'Login failed. Please check your credentials.');
@@ -58,7 +62,6 @@ function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Role Selector */}
           <div>
             <label htmlFor="role" className="block text-sm mb-1 text-gray-300">
               Select Role
@@ -74,7 +77,6 @@ function Login() {
             </select>
           </div>
 
-          {/* Dynamic Fields */}
           {role === 'student' ? (
             <div>
               <label htmlFor="regNo" className="block text-sm mb-1 text-gray-300">
@@ -107,7 +109,6 @@ function Login() {
             </div>
           )}
 
-          {/* Common Password Field */}
           <div>
             <label htmlFor="password" className="block text-sm mb-1 text-gray-300">
               Password
@@ -123,7 +124,6 @@ function Login() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-500 transition duration-200 text-white font-semibold py-2 rounded"
@@ -131,7 +131,6 @@ function Login() {
             Sign In
           </button>
 
-          {/* Redirect to Signup */}
           <button
             type="button"
             onClick={() => navigate('/signup')}

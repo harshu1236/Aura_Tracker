@@ -5,30 +5,43 @@ import teacherService from '../../services/teacherService';
 function Home() {
   const [userDetails, setUserDetails] = useState(null);
   const [isStudent, setIsStudent] = useState(false);
+  const [updateTrigger, setUpdateTrigger] = useState(0); // State to track updates
+
+  const fetchUserDetails = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const studentId = user?.studentId;
+      const teacherId = user?.teacherId;
+
+      if (studentId) {
+        setIsStudent(true);
+        const data = await studentService.getStudentById(studentId);
+        setUserDetails(data);
+      } else if (teacherId) {
+        setIsStudent(false);
+        const data = await teacherService.getTeacherById(teacherId);
+        setUserDetails(data);
+      } else {
+        console.error('User ID not found in localStorage');
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error.response || error.message);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const studentId = JSON.parse(localStorage.getItem('user'))?.studentId;
-        const teacherId = JSON.parse(localStorage.getItem('user'))?.teacherId;
-        
-        if (studentId) {
-          setIsStudent(true);
-          const data = await studentService.getStudentById(studentId);
-          setUserDetails(data);
-        } else if (teacherId) {
-          setIsStudent(false);
-          const data = await teacherService.getTeacherById(teacherId);
-          setUserDetails(data);
-        } else {
-          console.error('User ID not found in localStorage');
-        }
-      } catch (error) {
-        console.error('Error fetching user details:', error.response || error.message);
-      }
-    };
-
     fetchUserDetails();
+  }, [updateTrigger]); // Re-fetch user details when updateTrigger changes
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const storedTimestamp = localStorage.getItem('coursesUpdatedAt');
+      if (storedTimestamp) {
+        setUpdateTrigger(Number(storedTimestamp)); // Update trigger for refresh
+      }
+    }, 2000); // Check every 2 seconds
+
+    return () => clearInterval(interval); // Clear interval when component is destroyed
   }, []);
 
   if (!userDetails) {

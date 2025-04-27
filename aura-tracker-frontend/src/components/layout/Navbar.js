@@ -6,6 +6,9 @@ import { useNavigate, Link } from 'react-router-dom';
 function Navbar() {
   const navigate = useNavigate();
   const isAuthenticated = localStorage.getItem('token');
+  const userData = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+  const role = userData ? (userData.regNo ? 'student' : 'teacher') : null;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -19,20 +22,35 @@ function Navbar() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Aura Tracker
         </Typography>
+
         {isAuthenticated ? (
           <>
-            <Button color="inherit" component={Link} to="/home">
-              Home
-            </Button>
-            <Button color="inherit" component={Link} to="/courses">
-              Course
-            </Button>
-            <Button color="inherit" component={Link} to="/assignments">
-              Assignment
-            </Button>
-            <Button color="inherit" component={Link} to="/leaderboard">
-              Leaderboard
-            </Button>
+            {role === 'student' && (
+              <>
+                <Button color="inherit" component={Link} to="/home">
+                  Home
+                </Button>
+                <Button color="inherit" component={Link} to="/courses">
+                  Course
+                </Button>
+                <Button color="inherit" component={Link} to="/assignments">
+                  Assignment
+                </Button>
+                <Button color="inherit" component={Link} to="/leaderboard">
+                  Leaderboard
+                </Button>
+              </>
+            )}
+            {role === 'teacher' && (
+              <>
+                <Button color="inherit" component={Link} to="/courses">
+                  Course
+                </Button>
+                <Button color="inherit" component={Link} to="/assignments">
+                  Assignment
+                </Button>
+              </>
+            )}
             <Button color="inherit" onClick={handleLogout}>
               Logout
             </Button>

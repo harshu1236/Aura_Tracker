@@ -1,18 +1,16 @@
-// src/components/auth/Signup.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Signup() {
   const navigate = useNavigate();
-  const [role, setRole] = useState('student'); // Default: student
+  const [role, setRole] = useState('student');
   const [formData, setFormData] = useState({
     regNo: '',
     studentName: '',
     password: '',
   });
 
-  // Jab role change ho, formData ko reset karo
   useEffect(() => {
     if (role === 'student') {
       setFormData({
@@ -37,7 +35,7 @@ function Signup() {
           ? 'http://localhost:1211/api/auth/signup'
           : 'http://localhost:1211/auth/teacher/signup';
 
-      const payload = formData; // direct formData hi bhej rahe hain
+      const payload = formData;
 
       const response = await axios.post(url, payload);
       console.log('Signup successful:', response.data);
@@ -57,7 +55,6 @@ function Signup() {
         <h2 className="text-3xl font-bold text-center text-indigo-400 mb-6">Sign Up</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Role Selection */}
           <div>
             <label htmlFor="role" className="block text-sm text-gray-300 mb-1">
               Select Role
@@ -73,7 +70,6 @@ function Signup() {
             </select>
           </div>
 
-          {/* Dynamic Form Fields */}
           {role === 'student' ? (
             <>
               <div>
@@ -140,7 +136,6 @@ function Signup() {
             </>
           )}
 
-          {/* Password Field - common */}
           <div>
             <label htmlFor="password" className="block text-sm text-gray-300 mb-1">
               Password
@@ -156,7 +151,6 @@ function Signup() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded font-semibold transition duration-200"
