@@ -7,8 +7,10 @@ import com.harshit.AuraTracker.modal.Assignment;
 import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -53,5 +55,41 @@ public class TeacherController {
     public Teacher getTeacherById(@PathVariable Long teacherId) {
         return teacherService.getTeacherById(teacherId);
     }
+
+    @GetMapping("/{teacherId}/assignments")
+public List<Assignment> getAssignmentsForTeacher(@PathVariable Long teacherId) {
+    List<Course> courses = courseRepo.findByTeacher_TeacherId(teacherId);
+    List<Assignment> allAssignments = new ArrayList<>();
+
+    for (Course course : courses) {
+        allAssignments.addAll(assignmentRepo.findByCourses(course));
+    }
+
+    return allAssignments;
+}
+
+@DeleteMapping("/assignments/{assignmentId}")
+    public ResponseEntity<String> deleteAssignment(@PathVariable Long assignmentId) throws Exception {
+        Assignment assignment = assignmentRepo.findById(assignmentId)
+                .orElseThrow(() -> new Exception("Assignment not found with id: " + assignmentId));
+        assignmentRepo.delete(assignment);
+        return ResponseEntity.ok("Assignment deleted successfully.");
+    }
+
+    @PutMapping("/assignments/{assignmentId}")
+    public ResponseEntity<Assignment> updateAssignment(
+            @PathVariable Long assignmentId,
+            @RequestBody Assignment updatedAssignment
+    ) throws Exception {
+        Assignment assignment = assignmentRepo.findById(assignmentId)
+                .orElseThrow(() -> new Exception("Assignment not found with id: " + assignmentId));
+
+        assignment.setTitle(updatedAssignment.getTitle());
+        assignment.setDueDate(updatedAssignment.getDueDate());
+
+        Assignment savedAssignment = assignmentRepo.save(assignment);
+        return ResponseEntity.ok(savedAssignment);
+    }
+
 
 }
