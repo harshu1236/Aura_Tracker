@@ -7,9 +7,13 @@ import com.harshit.AuraTracker.modal.Assignment;
 import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +93,45 @@ public List<Assignment> getAssignmentsForTeacher(@PathVariable Long teacherId) {
 
         Assignment savedAssignment = assignmentRepo.save(assignment);
         return ResponseEntity.ok(savedAssignment);
+    }
+
+
+    @PostMapping("/courses/{courseId}/assignments/upload")
+public Assignment uploadAssignment(
+        @PathVariable Long courseId,
+        @RequestParam("title") String title,
+        @RequestParam("dueDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDate,
+        @RequestParam("file") MultipartFile file
+) throws Exception {
+    Course course = courseRepo.findById(courseId)
+            .orElseThrow(() -> new Exception("Course not found"));
+
+    // Target directory: "Aura_Tracker/uploads"
+    String uploadDir = System.getProperty("user.dir") + File.separator + "Aura_Tracker" + File.separator + "uploads";
+
+    File dir = new File(uploadDir);
+    if (!dir.exists()) {
+        dir.mkdirs();
+    }
+
+    String filePath = uploadDir + File.separator + file.getOriginalFilename();
+    file.transferTo(new File(filePath));
+
+    Assignment assignment = new Assignment();
+    assignment.setTitle(title);
+    assignment.setDueDate(dueDate);
+    assignment.setFileUrl(filePath);
+    assignment.setCourses(course);
+
+    return assignmentRepo.save(assignment);
+}
+
+
+    
+
+    @GetMapping("/courses/{courseId}/assignments")
+    public List<Assignment> getAssignmentsByCourse(@PathVariable Long courseId) {
+        return assignmentRepo.findByCourses_CourseId(courseId);
     }
 
 

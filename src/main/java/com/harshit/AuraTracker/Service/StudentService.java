@@ -14,6 +14,7 @@ public interface StudentService {
     Optional<Student> getStudentDataById(Integer id);
 
     List<Student> getAllStudent();
+    public Integer extractStudentIdFromToken(String token);
 
 
 }

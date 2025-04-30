@@ -1,3 +1,4 @@
+// ... imports
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
@@ -8,14 +9,13 @@ const Assignment = () => {
   const [assignments, setAssignments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newAssignment, setNewAssignment] = useState({
-    title: '',
-    dueDate: '',
-    courseId: '',
-  });
+  const [newAssignment, setNewAssignment] = useState({ title: '', dueDate: '', courseId: '' });
+  const [assignmentFile, setAssignmentFile] = useState(null);
   const [editAssignmentId, setEditAssignmentId] = useState(null);
   const [editAssignment, setEditAssignment] = useState({ title: '', dueDate: '' });
   const [adding, setAdding] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [studentSubmissionFiles, setStudentSubmissionFiles] = useState({});
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
@@ -25,11 +25,12 @@ const Assignment = () => {
 
   const fetchAssignments = async () => {
     try {
+      let courseList = [];
       if (role === 'STUDENT') {
-        const courseRes = await axios.get(`http://localhost:1211/api/courses/student/${studentId}`, {
+        const res = await axios.get(`http://localhost:1211/api/courses/student/${studentId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const courseList = courseRes.data;
+        courseList = res.data;
         setCourses(courseList);
 
         const allAssignments = [];
@@ -37,26 +38,20 @@ const Assignment = () => {
           const res = await axios.get(`http://localhost:1211/api/assignments/course/${course.id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          const assignmentsWithCourse = res.data.map((a) => ({
-            ...a,
-            courseName: course.courseName,
-          }));
-          allAssignments.push(...assignmentsWithCourse);
+          const withCourse = res.data.map((a) => ({ ...a, courseName: course.courseName }));
+          allAssignments.push(...withCourse);
         }
-
-        allAssignments.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-        setAssignments(allAssignments);
+        setAssignments(allAssignments.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)));
       } else if (role === 'TEACHER') {
-        const res = await axios.get(`http://localhost:1211/api/teacher/${teacherId}/assignments`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const sortedAssignments = res.data.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-        setAssignments(sortedAssignments);
-
-        const courseRes = await axios.get(`http://localhost:1211/api/teacher/${teacherId}/courses`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [assignmentRes, courseRes] = await Promise.all([
+          axios.get(`http://localhost:1211/api/teacher/${teacherId}/assignments`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`http://localhost:1211/api/teacher/${teacherId}/courses`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        setAssignments(assignmentRes.data.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)));
         setCourses(courseRes.data);
       }
     } catch (error) {
@@ -67,210 +62,178 @@ const Assignment = () => {
     }
   };
 
+  useEffect(() => { fetchAssignments(); }, []);
+
   const handleInputChange = (e) => {
     setNewAssignment({ ...newAssignment, [e.target.name]: e.target.value });
   };
 
   const handleAddAssignment = async () => {
     const { title, dueDate, courseId } = newAssignment;
-
     if (!title || !dueDate || !courseId) {
       toast.warn('Please fill all fields.');
+      return;
+    }
+    if (!assignmentFile) {
+      toast.warn('Please upload a file.');
       return;
     }
 
     setAdding(true);
     try {
-      if (role === 'TEACHER') {
-        await axios.post(`http://localhost:1211/api/teacher/${courseId}/assignments`, {
-          title,
-          dueDate,
-        }, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('dueDate', dueDate);
+      formData.append('file', assignmentFile);
 
-        toast.success('Assignment added successfully!');
-      } else {
-        toast.error('Students are not allowed to add assignments.');
-        setAdding(false);
-        return;
-      }
+      await axios.post(`http://localhost:1211/api/teacher/courses/${courseId}/assignments/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
+      toast.success('Assignment uploaded!');
       setNewAssignment({ title: '', dueDate: '', courseId: '' });
+      setAssignmentFile(null);
       fetchAssignments();
     } catch (error) {
-      console.error('Error adding assignment:', error.response || error.message);
-      toast.error('Failed to add assignment!');
+      console.error(error);
+      toast.error('Upload failed.');
     } finally {
       setAdding(false);
     }
   };
 
-  const handleDeleteAssignment = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this assignment?')) return;
+  const handleSubmitAnswer = async (assignmentId, file) => {
+    if (!file) {
+      toast.warn('Please select a file to upload.');
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append('file', file); // must match exactly with @RequestParam("file")
+      formData.append('studentId', studentId);
+  
+      await axios.post(`http://localhost:1211/api/std/assignments/${assignmentId}/submit`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      toast.success('Answer submitted!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Submission failed!');
+    }
+  };
+  
+  
 
+  const handleDeleteAssignment = async (id) => {
+    if (!window.confirm('Are you sure?')) return;
     try {
       await axios.delete(`http://localhost:1211/api/assignments/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success('Assignment deleted!');
-      setAssignments((prevAssignments) => prevAssignments.filter((assignment) => assignment.id !== id)); // Directly remove from UI
+      toast.success('Deleted!');
+      setAssignments(assignments.filter((a) => a.id !== id));
     } catch (error) {
-      console.error('Error deleting assignment:', error.response || error.message);
-      toast.error('Failed to delete assignment!');
+      console.error(error);
+      toast.error('Deletion failed!');
     }
   };
 
-  const startEditing = (assignment) => {
-    setEditAssignmentId(assignment.id);
-    setEditAssignment({ title: assignment.title, dueDate: assignment.dueDate });
-  };
-
-  const cancelEditing = () => {
-    setEditAssignmentId(null);
-    setEditAssignment({ title: '', dueDate: '' });
-  };
-
-  const handleEditChange = (e) => {
-    setEditAssignment({ ...editAssignment, [e.target.name]: e.target.value });
-  };
-
-  const handleUpdateAssignment = async () => {
+  const downloadFile = async (assignmentId, isSubmission = false) => {
     try {
-      await axios.put(`http://localhost:1211/api/assignments/${editAssignmentId}`, editAssignment, {
+      const url = isSubmission
+        ? `http://localhost:1211/api/std/assignments/${assignmentId}/submission`
+        : `http://localhost:1211/api/std/assignments/${assignmentId}/submissions`;
+
+      const res = await axios.get(url, {
+        responseType: 'blob',
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success('Assignment updated!');
-      cancelEditing();
-      fetchAssignments();
-    } catch (error) {
-      console.error('Error updating assignment:', error.response || error.message);
-      toast.error('Failed to update assignment!');
+
+      const blob = new Blob([res.data]);
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = isSubmission ? 'submission.pdf' : 'assignment.pdf';
+      link.click();
+    } catch (err) {
+      toast.error('Download failed');
     }
   };
 
-  useEffect(() => {
-    fetchAssignments();
-  }, []);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <p className="text-lg animate-pulse">Loading assignments...</p>
-      </div>
-    );
+    return <div className="text-white text-center p-10">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-6 py-10">
-      <ToastContainer position="top-right" autoClose={3000} />
+    <div className="min-h-screen bg-black text-white px-6 py-10">
+      <ToastContainer />
 
-      <h1 className="text-4xl font-bold text-center mb-10 text-indigo-400">
+      <h1 className="text-3xl font-bold text-center text-indigo-400 mb-8">
         {role === 'TEACHER' ? 'Assignments You Created' : 'Your Assignments'}
       </h1>
 
+      {/* Search */}
+      <input
+        className="w-full max-w-lg mx-auto block mb-6 px-4 py-2 bg-gray-800 text-white rounded border border-gray-600"
+        placeholder="Search by title or course..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      {/* Teacher Form */}
       {role === 'TEACHER' && (
-        <motion.div 
-          className="max-w-4xl mx-auto bg-gray-800 p-6 rounded-2xl shadow-xl mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-2xl font-semibold mb-4 text-teal-400">Add New Assignment</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              name="title"
-              placeholder="Title"
-              value={newAssignment.title}
-              onChange={handleInputChange}
-              className="px-4 py-2 rounded bg-gray-700 text-white border border-gray-600"
-            />
-            <input
-              type="date"
-              name="dueDate"
-              value={newAssignment.dueDate}
-              onChange={handleInputChange}
-              className="px-4 py-2 rounded bg-gray-700 text-white border border-gray-600"
-            />
-            <select
-              name="courseId"
-              value={newAssignment.courseId}
-              onChange={handleInputChange}
-              className="px-4 py-2 rounded bg-gray-700 text-white border border-gray-600"
-            >
-              <option value="" disabled>Select Course</option>
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.courseName}
-                </option>
-              ))}
+        <div className="bg-gray-800 rounded-2xl p-6 mb-10 max-w-4xl mx-auto">
+          <h2 className="text-xl font-semibold text-teal-300 mb-4">Add Assignment</h2>
+          <div className="grid md:grid-cols-4 gap-4">
+            <input name="title" value={newAssignment.title} onChange={handleInputChange} placeholder="Title" className="px-3 py-2 bg-gray-700 rounded text-white" />
+            <input type="date" name="dueDate" value={newAssignment.dueDate} onChange={handleInputChange} className="px-3 py-2 bg-gray-700 rounded text-white" />
+            <select name="courseId" value={newAssignment.courseId} onChange={handleInputChange} className="px-3 py-2 bg-gray-700 rounded text-white">
+              <option value="">Select Course</option>
+              {courses.map(c => <option key={c.id} value={c.id}>{c.courseName}</option>)}
             </select>
+            <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setAssignmentFile(e.target.files[0])} className="text-white" />
           </div>
-          <button
-            onClick={handleAddAssignment}
-            disabled={adding}
-            className="mt-4 bg-indigo-600 hover:bg-indigo-500 px-6 py-2 text-white rounded font-semibold"
-          >
-            {adding ? 'Adding...' : 'Add Assignment'}
+          <button onClick={handleAddAssignment} disabled={adding} className="mt-4 bg-indigo-600 px-6 py-2 rounded text-white">
+            {adding ? 'Uploading...' : 'Upload Assignment'}
           </button>
-        </motion.div>
+        </div>
       )}
 
-      {assignments.length === 0 ? (
-        <p className="text-center text-gray-400">No assignments found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {assignments.map((assignment, index) => (
-            <motion.div 
-              key={assignment.id} 
-              className="bg-gray-800 p-5 rounded-2xl shadow-lg relative"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              {editAssignmentId === assignment.id ? (
+      {/* Assignment Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {assignments
+          .filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || (a.courseName && a.courseName.toLowerCase().includes(searchQuery.toLowerCase())))
+          .map((a, i) => (
+            <motion.div key={a.id} className="bg-gray-800 p-5 rounded-xl shadow-lg" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+              <h3 className="text-lg font-semibold text-indigo-300">{a.title}</h3>
+              <p className="text-sm text-gray-400">Course: {a.courseName}</p>
+              <p className="text-sm text-yellow-400">Due: {a.dueDate}</p>
+
+              <button onClick={() => downloadFile(a.id)} className="mt-2 text-sm text-teal-400 underline">Download Assignment</button>
+
+              {role === 'TEACHER' && (
+                <div className="mt-4 flex gap-2">
+                  <button onClick={() => handleDeleteAssignment(a.id)} className="bg-red-600 px-3 py-1 rounded">Delete</button>
+                </div>
+              )}
+
+              {role === 'STUDENT' && (
                 <>
-                  <input
-                    type="text"
-                    name="title"
-                    value={editAssignment.title}
-                    onChange={handleEditChange}
-                    className="w-full px-3 py-2 mb-2 rounded bg-gray-700 text-white border border-gray-600"
-                  />
-                  <input
-                    type="date"
-                    name="dueDate"
-                    value={editAssignment.dueDate}
-                    onChange={handleEditChange}
-                    className="w-full px-3 py-2 mb-2 rounded bg-gray-700 text-white border border-gray-600"
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={handleUpdateAssignment} className="bg-green-600 px-3 py-1 rounded text-white">Save</button>
-                    <button onClick={cancelEditing} className="bg-red-600 px-3 py-1 rounded text-white">Cancel</button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-xl font-bold text-indigo-300">{assignment.title}</h3>
-                  <p className="text-gray-400 mt-1">
-                    <span className="font-medium text-teal-300">Course:</span> {assignment.courseName || (assignment.courses && assignment.courses.courseName)}
-                  </p>
-                  <p className="text-gray-400">
-                    <span className="font-medium text-yellow-400">Due Date:</span> {assignment.dueDate}
-                  </p>
-                  {role === 'TEACHER' && (
-                    <div className="flex gap-2 mt-4">
-                      <button onClick={() => startEditing(assignment)} className="bg-blue-600 px-3 py-1 rounded text-white">Edit</button>
-                      <button onClick={() => handleDeleteAssignment(assignment.id)} className="bg-red-600 px-3 py-1 rounded text-white">Delete</button>
-                    </div>
-                  )}
+                  <input type="file" accept=".pdf,.doc,.docx" className="mt-3 text-white" onChange={(e) => setStudentSubmissionFiles({ ...studentSubmissionFiles, [a.id]: e.target.files[0] })} />
+                  <button onClick={() => handleSubmitAnswer(a.id, studentSubmissionFiles[a.id])} className="mt-2 bg-green-600 px-3 py-1 rounded text-white">Submit</button>
+                  <button onClick={() => downloadFile(a.id, true)} className="mt-2 ml-2 text-sm text-blue-400 underline">Download My Submission</button>
                 </>
               )}
             </motion.div>
           ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

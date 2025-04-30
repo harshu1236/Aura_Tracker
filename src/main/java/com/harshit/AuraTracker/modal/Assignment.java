@@ -17,6 +17,8 @@ public class Assignment {
     private String title;
     private LocalDate dueDate;
 
+    private String fileUrl; // <-- new: file uploaded by teacher
+
     @ManyToOne
     @JoinColumn(name = "courseId")
     @JsonIgnore
