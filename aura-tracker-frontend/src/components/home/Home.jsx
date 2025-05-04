@@ -4,25 +4,26 @@ import teacherService from '../../services/teacherService';
 
 function Home() {
   const [userDetails, setUserDetails] = useState(null);
-  const [isStudent, setIsStudent] = useState(false);
-  const [updateTrigger, setUpdateTrigger] = useState(0); // State to track updates
+  const [role, setRole] = useState('');
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const fetchUserDetails = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      const studentId = user?.studentId;
-      const teacherId = user?.teacherId;
+      const { role: userRole, studentId, teacherId, name, email } = user || {};
+      setRole(userRole);
 
-      if (studentId) {
-        setIsStudent(true);
+      if (userRole === 'STUDENT' && studentId) {
         const data = await studentService.getStudentById(studentId);
         setUserDetails(data);
-      } else if (teacherId) {
-        setIsStudent(false);
+      } else if (userRole === 'TEACHER' && teacherId) {
         const data = await teacherService.getTeacherById(teacherId);
         setUserDetails(data);
+      } else if (userRole === 'ADMIN') {
+        // Set minimal admin details directly from localStorage
+        setUserDetails({ name, email });
       } else {
-        console.error('User ID not found in localStorage');
+        console.error('Invalid user role or ID');
       }
     } catch (error) {
       console.error('Error fetching user details:', error.response || error.message);
@@ -31,17 +32,17 @@ function Home() {
 
   useEffect(() => {
     fetchUserDetails();
-  }, [updateTrigger]); // Re-fetch user details when updateTrigger changes
+  }, [updateTrigger]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const storedTimestamp = localStorage.getItem('coursesUpdatedAt');
       if (storedTimestamp) {
-        setUpdateTrigger(Number(storedTimestamp)); // Update trigger for refresh
+        setUpdateTrigger(Number(storedTimestamp));
       }
-    }, 2000); // Check every 2 seconds
+    }, 2000);
 
-    return () => clearInterval(interval); // Clear interval when component is destroyed
+    return () => clearInterval(interval);
   }, []);
 
   if (!userDetails) {
@@ -54,30 +55,34 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-8">
-      {isStudent ? (
-        <>
-          <h1 className="text-4xl font-bold text-center text-teal-400 mb-12">
-            Welcome, {userDetails.studentName}
-          </h1>
+      <h1 className="text-4xl font-bold text-center text-teal-400 mb-12">
+        Welcome, {userDetails.name || userDetails.studentName}
+      </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Profile Card */}
-            <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-6 rounded-2xl shadow-2xl text-center">
-              <img
-                src={userDetails.avatar || 'https://i.pravatar.cc/150'}
-                alt="Avatar"
-                className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white object-cover"
-              />
-              <h2 className="text-2xl font-semibold text-white">{userDetails.studentName}</h2>
-              <p className="text-white text-opacity-80 mt-1">{userDetails.regNo}</p>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {/* Profile Card */}
+        <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-6 rounded-2xl shadow-2xl text-center">
+          <img
+            src={userDetails.avatar || 'https://i.pravatar.cc/150'}
+            alt="Avatar"
+            className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white object-cover"
+          />
+          <h2 className="text-2xl font-semibold text-white">
+            {userDetails.name || userDetails.studentName}
+          </h2>
+          <p className="text-white text-opacity-80 mt-1">
+            {userDetails.email || userDetails.regNo || 'Administrator'}
+          </p>
+        </div>
 
-            {/* Details Card */}
-            <div className="md:col-span-2 bg-gradient-to-br from-blue-700 to-indigo-800 p-6 rounded-2xl shadow-2xl border-t-4 border-teal-400">
-              <h3 className="text-xl font-semibold text-white mb-6 border-b pb-2 border-white">
-                Student Details
-              </h3>
-              <ul className="space-y-4">
+        {/* Details Card */}
+        <div className="md:col-span-2 bg-gradient-to-br from-blue-700 to-indigo-800 p-6 rounded-2xl shadow-2xl border-t-4 border-teal-400">
+          <h3 className="text-xl font-semibold text-white mb-6 border-b pb-2 border-white">
+            {role === 'STUDENT' ? 'Student Details' : role === 'TEACHER' ? 'Teacher Details' : 'Admin Panel'}
+          </h3>
+          <ul className="space-y-4">
+            {role === 'STUDENT' && (
+              <>
                 <li className="flex justify-between border-b border-gray-400 pb-2">
                   <span className="font-medium text-gray-200">Registration Number:</span>
                   <span className="text-teal-300">{userDetails.regNo}</span>
@@ -90,34 +95,10 @@ function Home() {
                   <span className="font-medium text-gray-200">Enrolled Courses:</span>
                   <span className="text-green-400">{userDetails.course?.length || 0}</span>
                 </li>
-              </ul>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <h1 className="text-4xl font-bold text-center text-teal-400 mb-12">
-            Welcome, {userDetails.name}
-          </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Profile Card */}
-            <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-6 rounded-2xl shadow-2xl text-center">
-              <img
-                src={userDetails.avatar || 'https://i.pravatar.cc/150'}
-                alt="Avatar"
-                className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white object-cover"
-              />
-              <h2 className="text-2xl font-semibold text-white">{userDetails.name}</h2>
-              <p className="text-white text-opacity-80 mt-1">{userDetails.email}</p>
-            </div>
-
-            {/* Teacher Details */}
-            <div className="md:col-span-2 bg-gradient-to-br from-blue-700 to-indigo-800 p-6 rounded-2xl shadow-2xl border-t-4 border-teal-400">
-              <h3 className="text-xl font-semibold text-white mb-6 border-b pb-2 border-white">
-                Teacher Details
-              </h3>
-              <ul className="space-y-4">
+              </>
+            )}
+            {role === 'TEACHER' && (
+              <>
                 <li className="flex justify-between border-b border-gray-400 pb-2">
                   <span className="font-medium text-gray-200">Email:</span>
                   <span className="text-teal-300">{userDetails.email}</span>
@@ -126,11 +107,22 @@ function Home() {
                   <span className="font-medium text-gray-200">Courses:</span>
                   <span className="text-green-400">{userDetails.courses?.length || 0}</span>
                 </li>
-              </ul>
-            </div>
-          </div>
-        </>
-      )}
+              </>
+            )}
+            {role === 'ADMIN' && (
+              <>
+                <li className="flex justify-between border-b border-gray-400 pb-2">
+                  <span className="font-medium text-gray-200">Email:</span>
+                  <span className="text-teal-300">{userDetails.email}</span>
+                </li>
+                <li className="text-gray-200">
+                  You have administrative privileges. You can manage users, courses, and monitor system activity.
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

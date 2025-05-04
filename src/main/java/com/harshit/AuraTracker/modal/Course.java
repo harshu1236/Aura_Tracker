@@ -17,6 +17,10 @@ public class Course {
     private String courseName;
     private String description;
 
+    private String courseBranch;
+    private String courseType;
+    private int semester;
+
     @ManyToOne
     @JoinColumn(name = "studentId")
     @JsonIgnore
@@ -26,18 +30,7 @@ public class Course {
     @JoinColumn(name = "teacherId")
     private Teacher teacher;
 
-    public Teacher getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
-
-
-
-
-    @OneToMany(mappedBy = "courses",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courses", cascade = CascadeType.ALL)
     private List<Assignment> assignments;
 
     public Long getId() {
@@ -52,7 +45,7 @@ public class Course {
         return courseName;
     }
 
-    public void setCourse_Name(String course_Name) {
+    public void setCourseName(String course_Name) {
         this.courseName = course_Name;
     }
 
@@ -64,12 +57,44 @@ public class Course {
         this.description = description;
     }
 
+    public String getCourseBranch() {
+        return courseBranch;
+    }
+
+    public void setCourseBranch(String courseBranch) {
+        this.courseBranch = courseBranch;
+    }
+
+    public String getCourseType() {
+        return courseType;
+    }
+
+    public void setCourseType(String courseType) {
+        this.courseType = courseType;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
     public Student getStudent() {
         return student;
     }
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
     public List<Assignment> getAssignments() {

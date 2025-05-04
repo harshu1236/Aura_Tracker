@@ -9,6 +9,9 @@ function Signup() {
     regNo: '',
     studentName: '',
     password: '',
+    courseType: 'BTECH', // Default course type for student
+    semester: '',
+    course: '', // List of courses or a single course as a string
   });
 
   useEffect(() => {
@@ -17,6 +20,9 @@ function Signup() {
         regNo: '',
         studentName: '',
         password: '',
+        courseType: 'BTECH',
+        semester: '',
+        course: '',
       });
     } else {
       setFormData({
@@ -96,6 +102,54 @@ function Signup() {
                   id="studentName"
                   name="studentName"
                   value={formData.studentName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="courseType" className="block text-sm text-gray-300 mb-1">
+                  Course Type
+                </label>
+                <select
+                  id="courseType"
+                  name="courseType"
+                  value={formData.courseType}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="BTECH">BTECH</option>
+                  <option value="MASTERS">MASTERS</option>
+                  <option value="PHD">PHD</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="semester" className="block text-sm text-gray-300 mb-1">
+                  Semester
+                </label>
+                <input
+                  type="number"
+                  id="semester"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="course" className="block text-sm text-gray-300 mb-1">
+                  Course
+                </label>
+                <input
+                  type="text"
+                  id="course"
+                  name="course"
+                  value={formData.course}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"

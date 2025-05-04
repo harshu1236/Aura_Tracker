@@ -2,7 +2,7 @@ package com.harshit.AuraTracker.Service;
 
 import com.harshit.AuraTracker.Repository.StudentRepository;
 import com.harshit.AuraTracker.modal.Student;
-
+import com.harshit.AuraTracker.modal.Student.CourseType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class StudentServiceImpl implements StudentService{
+public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
@@ -21,22 +21,24 @@ public class StudentServiceImpl implements StudentService{
     @Override
     public Student createStudent(Student student) {
 
-        Student saved = studentRepository.save(student);
-        System.out.println("saved student "+saved.getStudentId());
-        System.out.println("saved student "+saved.getStudent_Name());
-        System.out.println("saved student "+saved.getCourses());
-        System.out.println("saved student "+saved.getPassword());
-        System.out.println("saved student "+saved.getRegNo());
-        return saved;
+        // Make sure to set default values if needed
+        if (student.getStudentCourse() == null) {
+            student.setStudentCourse("Unknown Course");
+        }
+        if (student.getSemester() == 0) {
+            student.setSemester(1);  // Default semester
+        }
+        if (student.getCourseType() == null) {
+            student.setCourseType(CourseType.BTECH);  // Default course type
+        }
+
+        // Save the student object and return the saved instance
+        return studentRepository.save(student);
     }
 
     @Override
     public Optional<Student> getStudentDataById(Integer studentId) {
-        if (studentRepository.findById(studentId).isPresent())
-        {
-            return studentRepository.findById(studentId);
-        }
-        return null;
+        return studentRepository.findById(studentId);
     }
 
     @Override
@@ -44,15 +46,13 @@ public class StudentServiceImpl implements StudentService{
         return studentRepository.findAll();
     }
 
-
     @Override
     public Integer extractStudentIdFromToken(String token) {
-    Claims claims = Jwts.parser()
-        .setSigningKey("9Dkfl8h38@Vns93!nfi38cnQ94fnV3mcnA47vNfi29@cnvXfi93vMCn39vncXfi") // Replace with your secret
-        .parseClaimsJws(token)
-        .getBody();
+        Claims claims = Jwts.parser()
+            .setSigningKey("9Dkfl8h38@Vns93!nfi38cnQ94fnV3mcnA47vNfi29@cnvXfi93vMCn39vncXfi") // Replace with your secret
+            .parseClaimsJws(token)
+            .getBody();
 
-    return Integer.parseInt(claims.get("studentId").toString());
-}
-
+        return Integer.parseInt(claims.get("studentId").toString());
+    }
 }

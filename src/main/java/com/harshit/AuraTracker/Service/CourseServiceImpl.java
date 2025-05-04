@@ -23,7 +23,6 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
     }
-
     @Override
     public Course createCourse(Course course, int studentId) throws Exception {
         Optional<Student> student = studentRepository.findById(studentId);
@@ -34,7 +33,6 @@ public class CourseServiceImpl implements CourseService {
             throw new Exception("Student not found with id " + studentId);
         }
     }
-
     @Override
     public List<Course> getCoursebyStudentId(int studentId) throws Exception {
         Optional<Student> student = studentRepository.findById(studentId);
@@ -43,5 +41,9 @@ public class CourseServiceImpl implements CourseService {
         } else {
             throw new Exception("Student not found with id " + studentId);
         }
+    } 
+    @Override
+    public List<Course> getCoursesByCourseTypeAndBranchAndSemester(String courseName, String courseBranch, int semester) {
+        return courseRepository.findByCourseTypeAndCourseBranchAndSemester(courseName, courseBranch, semester);
     }
 }

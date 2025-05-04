@@ -23,25 +23,38 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     try {
-      const url =
-        role === 'student'
-          ? 'http://localhost:1211/api/auth/login'
-          : 'http://localhost:1211/auth/teacher/login';
-
+      let url = '';
+  
+      if (role === 'student') {
+        url = 'http://localhost:1211/api/auth/login';
+      } else if (role === 'teacher') {
+        url = 'http://localhost:1211/auth/teacher/login';
+      } else if (role === 'admin') {
+        url = 'http://localhost:1211/auth/admin/login';
+      }
+  
       const response = await axios.post(url, formData, { withCredentials: true });
-
+  
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-
+  
         const userData = {
-          ...(response.data.student || response.data.teacher),
-          role: role.toUpperCase()  // 👈 Role bhi save ho raha hai ab
+          ...(response.data.student || response.data.teacher || response.data.admin),
+          role: role.toUpperCase()
         };
-
+  
         localStorage.setItem('user', JSON.stringify(userData));
-        navigate('/home', { replace: true });
+        // Redirect based on role after successful login
+        if (role === 'student') {
+          navigate('/home', { replace: true });
+        } else if (role === 'teacher') {
+          navigate('/teacher/home', { replace: true });
+        } else if (role === 'admin') {
+          // Redirect to the student page after successful admin login
+          navigate('/home', { replace: true });
+        }
       } else {
         setError(response.data.message || 'Login failed. Please check your credentials.');
       }
@@ -49,7 +62,6 @@ function Login() {
       setError(err.response?.data?.message || 'An error occurred during login');
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700">
@@ -60,7 +72,6 @@ function Login() {
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="role" className="block text-sm mb-1 text-gray-300">
@@ -74,6 +85,7 @@ function Login() {
             >
               <option value="student">Student</option>
               <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -131,13 +143,15 @@ function Login() {
             Sign In
           </button>
 
-          <button
-            type="button"
-            onClick={() => navigate('/signup')}
-            className="w-full text-indigo-300 mt-2 hover:underline text-sm"
-          >
-            Don’t have an account? Sign Up
-          </button>
+          {role !== 'admin' && (
+            <button
+              type="button"
+              onClick={() => navigate('/signup')}
+              className="w-full text-indigo-300 mt-2 hover:underline text-sm"
+            >
+              Don’t have an account? Sign Up
+            </button>
+          )}
         </form>
       </div>
     </div>
