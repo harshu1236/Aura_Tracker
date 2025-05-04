@@ -26,7 +26,9 @@ public class TeacherServiceImpl implements TeacherService{
     @Override
     public Teacher getTeacherById(Long teacherId) {
         // TODO Auto-generated method stub
-        return teacherRepository.findByTeacherId(teacherId).orElse(null);
+        throw new UnsupportedOperationException("Unimplemented method 'getTeacherById'");
     }
+
+    
 
 }

@@ -8,7 +8,13 @@ function Navbar() {
   const isAuthenticated = localStorage.getItem('token');
   const userData = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
-  const role = userData ? (userData.regNo ? 'student' : 'teacher') : null;
+  const role = userData
+    ? userData.regNo
+      ? 'student'
+      : userData.name && userData.email && userData.password && !userData.regNo
+      ? 'admin'
+      : 'teacher'
+    : null;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -48,6 +54,22 @@ function Navbar() {
                 </Button>
                 <Button color="inherit" component={Link} to="/assignments">
                   Assignment
+                </Button>
+              </>
+            )}
+            {role === 'admin' && (
+              <>
+                <Button color="inherit" component={Link} to="/home">
+                  Home
+                </Button>
+                <Button color="inherit" component={Link} to="/admin/students">
+                  Student
+                </Button>
+                <Button color="inherit" component={Link} to="/admin/teachers">
+                  Teacher
+                </Button>
+                <Button color="inherit" component={Link} to="/admin/courses">
+                  Course
                 </Button>
               </>
             )}

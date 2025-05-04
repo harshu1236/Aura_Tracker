@@ -29,10 +29,10 @@ public class TeacherController {
     @Autowired
     private TeacherService teacherService;
 
-    @GetMapping("/{teacherId}/courses")
-    public List<Course> getCourses(@PathVariable Long teacherId) {
-        return courseRepo.findByTeacher_TeacherId(teacherId);
-    }
+    // @GetMapping("/{teacherId}/courses")
+    // public List<Course> getCourses(@PathVariable Long teacherId) {
+    //     return courseRepo.findByTeacher_TeacherId(teacherId);
+    // }
 
     @PostMapping("/{courseId}/assignments")
     public Assignment addAssignment(
@@ -60,17 +60,17 @@ public class TeacherController {
         return teacherService.getTeacherById(teacherId);
     }
 
-    @GetMapping("/{teacherId}/assignments")
-public List<Assignment> getAssignmentsForTeacher(@PathVariable Long teacherId) {
-    List<Course> courses = courseRepo.findByTeacher_TeacherId(teacherId);
-    List<Assignment> allAssignments = new ArrayList<>();
+//     @GetMapping("/{teacherId}/assignments")
+// public List<Assignment> getAssignmentsForTeacher(@PathVariable Long teacherId) {
+//     List<Course> courses = courseRepo.findByTeacher_TeacherId(teacherId);
+//     List<Assignment> allAssignments = new ArrayList<>();
 
-    for (Course course : courses) {
-        allAssignments.addAll(assignmentRepo.findByCourses(course));
-    }
+//     for (Course course : courses) {
+//         allAssignments.addAll(assignmentRepo.findByCourses(course));
+//     }
 
-    return allAssignments;
-}
+//     return allAssignments;
+// }
 
 @DeleteMapping("/assignments/{assignmentId}")
     public ResponseEntity<String> deleteAssignment(@PathVariable Long assignmentId) throws Exception {

@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,8 +27,18 @@ public class Student {
 
     private String role = "STUDENT";
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<Course> course;
+    // @ManyToOne
+    // @JoinColumn(name = "courseId")
+    // @JsonIgnore
+    // private Course courses;
+
+    @ManyToMany
+    @JoinTable(
+    name = "student_course",
+    joinColumns = @JoinColumn(name = "student_id"),
+    inverseJoinColumns = @JoinColumn(name = "course_id"))
+    private List<Course> courses;
+
 
     private int points;
 
@@ -55,11 +66,11 @@ public class Student {
     }
 
     public List<Course> getCourse() {
-        return course;
+        return getCourse();
     }
 
-    public void setCourse(List<Course> course) {
-        this.course = course;
+    public void setCourse(Course course) {
+        this.courses =  (List<Course>) course;
     }
 
     public int getPoints() {

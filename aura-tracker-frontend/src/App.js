@@ -11,6 +11,7 @@ import Leaderboard from './components/leaderboard/Leaderboard';
 import StudentProfile from './components/student/StudentProfile';
 import CoursePage from './components/course/CoursePage';
 import Assignment from './components/assignment/Assignment';
+import AdminCourseManager from './components/admin/AdmisCourseManager';
 
 // ✅ Add this when you create AssignmentPage
 // import AssignmentPage from './components/assignment/AssignmentPage';
@@ -51,6 +52,9 @@ function App() {
               {/* <Route path="/timetable/add" element={<TimetableForm />} /> */}
               {/* <Route path="/rewards" element={<RewardList />} /> */}
               <Route path="/assignments" element={<Assignment />} />
+
+              <Route path="/admin/courses" element={<AdminCourseManager />} />
+
               {/* <Route path="/assignments" element={<AssignmentPage />} /> */}
             </Route>
           </Routes>

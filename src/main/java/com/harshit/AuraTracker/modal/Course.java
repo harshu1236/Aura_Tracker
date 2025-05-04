@@ -21,14 +21,9 @@ public class Course {
     private String courseType;
     private int semester;
 
-    @ManyToOne
-    @JoinColumn(name = "studentId")
-    @JsonIgnore
-    private Student student;
+    
 
-    @ManyToOne
-    @JoinColumn(name = "teacherId")
-    private Teacher teacher;
+    
 
     @OneToMany(mappedBy = "courses", cascade = CascadeType.ALL)
     private List<Assignment> assignments;
@@ -81,21 +76,9 @@ public class Course {
         this.semester = semester;
     }
 
-    public Student getStudent() {
-        return student;
-    }
+    
 
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Teacher getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
+    
 
     public List<Assignment> getAssignments() {
         return assignments;

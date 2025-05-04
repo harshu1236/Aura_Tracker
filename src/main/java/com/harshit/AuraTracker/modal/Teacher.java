@@ -17,9 +17,18 @@ public class Teacher {
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "teacher")
-    @JsonIgnore
+    // @ManyToOne
+    // @JoinColumn(name = "courseId")
+    // @JsonIgnore
+    // private Course courses;
+
+    @ManyToMany
+    @JoinTable(
+    name = "teacher_course",
+    joinColumns = @JoinColumn(name = "teacher_id"),
+    inverseJoinColumns = @JoinColumn(name = "course_id"))
     private List<Course> courses;
+
 
     public Teacher() {
     }
@@ -52,7 +61,7 @@ public class Teacher {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses( List<Course> courses) {
         this.courses = courses;
     }
 }

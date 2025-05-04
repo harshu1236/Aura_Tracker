@@ -19,31 +19,28 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     StudentRepository studentRepository;
 
-    @Override
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
-    }
-    @Override
-    public Course createCourse(Course course, int studentId) throws Exception {
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isPresent()) {
-            course.setStudent(student.get());
-            return courseRepository.save(course);
-        } else {
-            throw new Exception("Student not found with id " + studentId);
-        }
-    }
-    @Override
-    public List<Course> getCoursebyStudentId(int studentId) throws Exception {
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isPresent()) {
-            return courseRepository.findByStudent_StudentId((long) studentId);
-        } else {
-            throw new Exception("Student not found with id " + studentId);
-        }
-    } 
-    @Override
-    public List<Course> getCoursesByCourseTypeAndBranchAndSemester(String courseName, String courseBranch, int semester) {
-        return courseRepository.findByCourseTypeAndCourseBranchAndSemester(courseName, courseBranch, semester);
-    }
+    // @Override
+    // public List<Course> getAllCourses() {
+    //     return courseRepository.findAll();
+    // }
+    // @Override
+    // public Course createCourse(Course course, int studentId) throws Exception {
+    //     Optional<Student> student = studentRepository.findById(studentId);
+    //     if (student.isPresent()) {
+            
+    //         return courseRepository.save(course);
+    //     } else {
+    //         throw new Exception("Student not found with id " + studentId);
+    //     }
+    // }
+    // @Override
+    // public List<Course> getCoursebyStudentId(int studentId) throws Exception {
+    //     Optional<Student> student = studentRepository.findById(studentId);
+    //     if (student.isPresent()) {
+    //         return courseRepository.findByStudent_StudentId((long) studentId);
+    //     } else {
+    //         throw new Exception("Student not found with id " + studentId);
+    //     }
+    // }
+    
 }

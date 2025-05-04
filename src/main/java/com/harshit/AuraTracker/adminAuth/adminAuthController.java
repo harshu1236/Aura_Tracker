@@ -14,7 +14,7 @@ public class adminAuthController {
     private JwtTokenProvider jwtTokenProvider;
 
     private static final String HARDCODED_EMAIL = "admin@com";
-    private static final String HARDCODED_PASSWORD = "admin123"; // plaintext password for testing
+    private static final String HARDCODED_PASSWORD = "123456"; // plaintext password for testing
 
     @PostMapping("/login")
     public AuthResponseForAdmin login(@RequestBody Admin loginRequest) {
