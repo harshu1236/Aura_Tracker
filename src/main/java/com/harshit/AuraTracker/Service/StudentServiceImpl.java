@@ -2,7 +2,6 @@ package com.harshit.AuraTracker.Service;
 
 import com.harshit.AuraTracker.Repository.StudentRepository;
 import com.harshit.AuraTracker.modal.Student;
-import com.harshit.AuraTracker.modal.Student.CourseType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -22,15 +21,8 @@ public class StudentServiceImpl implements StudentService {
     public Student createStudent(Student student) {
 
         // Make sure to set default values if needed
-        if (student.getStudentCourse() == null) {
-            student.setStudentCourse("Unknown Course");
-        }
-        if (student.getSemester() == 0) {
-            student.setSemester(1);  // Default semester
-        }
-        if (student.getCourseType() == null) {
-            student.setCourseType(CourseType.BTECH);  // Default course type
-        }
+        
+        
 
         // Save the student object and return the saved instance
         return studentRepository.save(student);

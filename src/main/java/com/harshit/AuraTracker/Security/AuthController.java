@@ -1,13 +1,19 @@
 package com.harshit.AuraTracker.Security;
 
+
+
+import com.harshit.AuraTracker.Repository.CourseRepository;
 import com.harshit.AuraTracker.Repository.StudentRepository;
 import com.harshit.AuraTracker.dto.AuthResponse;
 import com.harshit.AuraTracker.dto.LoginRequest;
+import com.harshit.AuraTracker.dto.StudentSignupRequest;
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -16,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -37,14 +46,40 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public AuthResponse signup(@RequestBody Student signupRequest) {
-        if (studentRepository.findByRegNo(signupRequest.getRegNo()).isPresent()) {
-            return new AuthResponse(null, "Registration Number already exists", null);
-        }
-        // encode the password
-        signupRequest.setPassword(passwordEncoder.encode(signupRequest.getPassword().trim()));
-        Student saved = studentRepository.save(signupRequest);
-        String token = jwtTokenProvider.generateToken(saved.getRegNo());
-        return new AuthResponse(token, "Signup Successful", saved);
+public AuthResponse signup(@RequestBody StudentSignupRequest signupRequest) {
+    if (studentRepository.findByRegNo(signupRequest.getRegNo()).isPresent()) {
+        return new AuthResponse(null, "Registration Number already exists", null);
     }
+
+    Optional<Course> courseOpt = courseRepository.findByCourseTypeAndCourseBranchAndSemester(
+        signupRequest.getCourseType().trim(),
+        signupRequest.getCourseBranch().trim(),
+        signupRequest.getSemester());
+
+
+        System.out.println("Received values: " +
+        signupRequest.getCourseType() + ", " +
+        signupRequest.getCourseBranch() + ", " +
+        signupRequest.getSemester());
+    
+    if (!courseOpt.isPresent()) {
+        return new AuthResponse(null, "Invalid course details. Please choose from available options.", null);
+    }
+
+    Course course = courseOpt.get();
+
+    Student student = new Student();
+    student.setStudentName(signupRequest.getStudentName());
+    student.setRegNo(signupRequest.getRegNo());
+    student.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+    student.setSemester(signupRequest.getSemester());
+    student.setRole("STUDENT");
+    student.setCourses(List.of(course));  // link the course
+
+    studentRepository.save(student);
+
+    String token = jwtTokenProvider.generateToken(student.getRegNo());
+    return new AuthResponse(token, "Signup Successful", student);
+}
+
 }

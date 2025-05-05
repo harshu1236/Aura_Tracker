@@ -1,7 +1,10 @@
 package com.harshit.AuraTracker.modal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,45 +20,26 @@ public class Student {
     private Long studentId;
 
     @Column(nullable = false)
-    @JsonProperty("studentName")
     private String studentName;
 
-    @Column(name = "regNo", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String regNo;
 
     private String password;
 
     private String role = "STUDENT";
 
-    // @ManyToOne
-    // @JoinColumn(name = "courseId")
-    // @JsonIgnore
-    // private Course courses;
-
-    @ManyToMany
-    @JoinTable(
-    name = "student_course",
-    joinColumns = @JoinColumn(name = "student_id"),
-    inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private List<Course> courses;
-
-
     private int points;
-
-    private String studentCourse;
 
     private int semester;
 
-    @Enumerated(EnumType.STRING)
-    private CourseType courseType;
-
-    // Enum for course type
-    public enum CourseType {
-        BTECH,
-        MASTERS,
-        PHD
-    }
-
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "studentId"),
+        inverseJoinColumns = @JoinColumn(name = "courseId"))
+        @JsonManagedReference
+    private List<Course> courses;  // student can enroll in multiple courses
     // Standard getters and setters (if needed)
     public String getRole() {
         return role;
@@ -65,12 +49,12 @@ public class Student {
         this.role = role;
     }
 
-    public List<Course> getCourse() {
-        return getCourse();
+    public List<Course> getCourses() {
+        return courses;
     }
 
-    public void setCourse(Course course) {
-        this.courses =  (List<Course>) course;
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
     }
 
     public int getPoints() {
@@ -113,13 +97,7 @@ public class Student {
         this.password = password;
     }
 
-    public String getStudentCourse() {
-        return studentCourse;
-    }
-
-    public void setStudentCourse(String studentCourse) {
-        this.studentCourse = studentCourse;
-    }
+    
 
     public int getSemester() {
         return semester;
@@ -129,11 +107,5 @@ public class Student {
         this.semester = semester;
     }
 
-    public CourseType getCourseType() {
-        return courseType;
-    }
-
-    public void setCourseType(CourseType courseType) {
-        this.courseType = courseType;
-    }
+    
 }

@@ -25,10 +25,9 @@ public class Teacher {
     @ManyToMany
     @JoinTable(
     name = "teacher_course",
-    joinColumns = @JoinColumn(name = "teacher_id"),
-    inverseJoinColumns = @JoinColumn(name = "course_id"))
+    joinColumns = @JoinColumn(name = "teacherId"),
+    inverseJoinColumns = @JoinColumn(name = "courseId"))
     private List<Course> courses;
-
 
     public Teacher() {
     }
