@@ -1,5 +1,6 @@
 package com.harshit.AuraTracker.Service;
 
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public interface StudentService {
 
     List<Student> getAllStudent();
     public Integer extractStudentIdFromToken(String token);
+
+    List<Course> getCoursesByStudentId(Long studentId);
 
 
 }

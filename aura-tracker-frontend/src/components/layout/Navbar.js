@@ -1,4 +1,3 @@
-// src/components/layout/Navbar.js
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
@@ -8,13 +7,8 @@ function Navbar() {
   const isAuthenticated = localStorage.getItem('token');
   const userData = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
-  const role = userData
-    ? userData.regNo
-      ? 'student'
-      : userData.name && userData.email && userData.password && !userData.regNo
-      ? 'admin'
-      : 'teacher'
-    : null;
+  // ✅ More reliable role detection
+  const role = userData?.role?.toLowerCase(); // 'student', 'teacher', or 'admin'
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -49,6 +43,9 @@ function Navbar() {
             )}
             {role === 'teacher' && (
               <>
+                <Button color="inherit" component={Link} to="/home">
+                  Home
+                </Button>
                 <Button color="inherit" component={Link} to="/courses">
                   Course
                 </Button>

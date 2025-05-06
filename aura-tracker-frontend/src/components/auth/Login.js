@@ -50,7 +50,7 @@ function Login() {
         if (role === 'student') {
           navigate('/home', { replace: true });
         } else if (role === 'teacher') {
-          navigate('/teacher/home', { replace: true });
+          navigate('/home', { replace: true });
         } else if (role === 'admin') {
           // Redirect to the student page after successful admin login
           navigate('/home', { replace: true });

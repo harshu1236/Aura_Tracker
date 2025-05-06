@@ -6,6 +6,7 @@ import com.harshit.AuraTracker.Repository.StudentRepository;
 import com.harshit.AuraTracker.Service.StudentService;
 import com.harshit.AuraTracker.modal.Assignment;
 import com.harshit.AuraTracker.modal.AssignmentSubmission;
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -110,6 +111,11 @@ public class StudentController {
         }
 
         return new InputStreamResource(new FileInputStream(file));
+    }
+
+    @GetMapping("/{id}/courses")
+    public List<Course> getCoursesByStudentId(@PathVariable Long id) {
+        return studentService.getCoursesByStudentId(id);
     }
 
 }

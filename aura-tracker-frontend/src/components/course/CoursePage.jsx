@@ -25,17 +25,14 @@ const CoursePage = () => {
   const teacherId = user?.teacherId;
 
   const fetchCourses = async () => {
-    if (!user || !role) {
-      console.error('No user or role found, cannot fetch courses.');
-      return;
-    }
+    if (!user || !role) return;
 
     try {
       setLoading(true);
       let response;
 
       if (role === 'STUDENT' && studentId) {
-        response = await axios.get(`http://localhost:1211/api/courses/student/${studentId}`, {
+        response = await axios.get(`http://localhost:1211/api/std/${studentId}/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else if (role === 'TEACHER' && teacherId) {
@@ -43,14 +40,12 @@ const CoursePage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        console.error('Unknown role or missing ID. Cannot fetch courses.');
         return;
       }
 
       const courseList = response.data;
       setCourses(courseList);
 
-      // Fetch chapters for each course
       const chapterMap = {};
       await Promise.all(
         courseList.map(async (course) => {
@@ -59,14 +54,12 @@ const CoursePage = () => {
               headers: { Authorization: `Bearer ${token}` },
             });
             chapterMap[course.id] = res.data;
-          } else {
-            console.error('Course missing ID:', course);
           }
         })
       );
       setChapters(chapterMap);
     } catch (error) {
-      console.error('Error fetching courses or chapters:', error.response?.data || error.message);
+      console.error('Error fetching courses:', error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +67,6 @@ const CoursePage = () => {
 
   useEffect(() => {
     fetchCourses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (courseId, field, value) => {
@@ -101,19 +93,15 @@ const CoursePage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Reset fields
       setNewChapters((prev) => ({
         ...prev,
         [courseId]: { title: '', description: '' },
       }));
 
-      fetchCourses(); // Refresh courses
-
-      // Update localStorage and trigger the Home page update
+      fetchCourses();
       localStorage.setItem('coursesUpdatedAt', Date.now());
-      
     } catch (error) {
-      console.error('Error adding chapter:', error.response?.data || error.message);
+      console.error('Error adding chapter:', error);
     }
   };
 

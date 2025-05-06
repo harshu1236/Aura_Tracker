@@ -16,6 +16,7 @@ public class Teacher {
     private String name;
     private String email;
     private String password;
+    private int semester;
 
     // @ManyToOne
     // @JoinColumn(name = "courseId")

@@ -20,26 +20,25 @@ function Signup() {
   const [filteredBranches, setFilteredBranches] = useState([]);
   const [filteredSemesters, setFilteredSemesters] = useState([]);
 
+  // Fetch course options for both student and teacher
   useEffect(() => {
-    if (role === 'student') {
-      axios
-        .get('http://localhost:1211/api/public/available-course-options')
-        .then((res) => {
-          if (Array.isArray(res.data)) {
-            setCourseData(res.data);
-          } else {
-            console.error('Invalid course options format:', res.data);
-            setCourseData([]);
-          }
-        })
-        .catch((err) => {
-          console.error('API error:', err);
+    axios
+      .get('http://localhost:1211/api/public/available-course-options')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setCourseData(res.data);
+        } else {
+          console.error('Invalid course options format:', res.data);
           setCourseData([]);
-        });
-    }
-  }, [role]);
+        }
+      })
+      .catch((err) => {
+        console.error('API error:', err);
+        setCourseData([]);
+      });
+  }, []);
 
-  // Update branches when courseType changes
+  // Update filtered branches on courseType change
   useEffect(() => {
     if (formData.courseType) {
       const branches = [
@@ -50,16 +49,16 @@ function Signup() {
         ),
       ];
       setFilteredBranches(branches);
-      setFilteredSemesters([]); // reset semesters when branch changes
+      setFilteredSemesters([]);
       setFormData((prev) => ({
         ...prev,
-        courseBranch: '', // reset branch
-        semester: '', // reset semester
+        courseBranch: '',
+        semester: '',
       }));
     }
   }, [formData.courseType, courseData]);
 
-  // Update semesters when branch changes
+  // Update filtered semesters on branch change
   useEffect(() => {
     if (formData.courseType && formData.courseBranch) {
       const semesters = [
@@ -72,7 +71,7 @@ function Signup() {
             )
             .map((c) => c.semester)
         ),
-      ].sort((a, b) => a - b); // Sort semesters numerically
+      ].sort((a, b) => a - b);
       setFilteredSemesters(semesters);
       setFormData((prev) => ({ ...prev, semester: '' }));
     }
@@ -128,6 +127,7 @@ function Signup() {
             </select>
           </div>
 
+          {/* Common Fields */}
           {role === 'student' ? (
             <>
               <input
@@ -146,53 +146,6 @@ function Signup() {
                 required
                 className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
               />
-
-              <select
-                name="courseType"
-                value={formData.courseType}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
-              >
-                <option value="">Select Course Type</option>
-                {uniqueCourseTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="courseBranch"
-                value={formData.courseBranch}
-                onChange={handleChange}
-                disabled={!filteredBranches.length}
-                required
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
-              >
-                <option value="">Select Branch</option>
-                {filteredBranches.map((branch) => (
-                  <option key={branch} value={branch}>
-                    {branch}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="semester"
-                value={formData.semester}
-                onChange={handleChange}
-                disabled={!filteredSemesters.length}
-                required
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
-              >
-                <option value="">Select Semester</option>
-                {filteredSemesters.map((sem) => (
-                  <option key={sem} value={sem}>
-                    {sem}
-                  </option>
-                ))}
-              </select>
             </>
           ) : (
             <>
@@ -215,6 +168,57 @@ function Signup() {
             </>
           )}
 
+          {/* Course Type */}
+          <select
+            name="courseType"
+            value={formData.courseType}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
+          >
+            <option value="">Select Course Type</option>
+            {uniqueCourseTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+
+          {/* Course Branch */}
+          <select
+            name="courseBranch"
+            value={formData.courseBranch}
+            onChange={handleChange}
+            disabled={!filteredBranches.length}
+            required
+            className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
+          >
+            <option value="">Select Branch</option>
+            {filteredBranches.map((branch) => (
+              <option key={branch} value={branch}>
+                {branch}
+              </option>
+            ))}
+          </select>
+
+          {/* Semester */}
+          <select
+            name="semester"
+            value={formData.semester}
+            onChange={handleChange}
+            disabled={!filteredSemesters.length}
+            required
+            className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
+          >
+            <option value="">Select Semester</option>
+            {filteredSemesters.map((sem) => (
+              <option key={sem} value={sem}>
+                {sem}
+              </option>
+            ))}
+          </select>
+
+          {/* Password */}
           <input
             name="password"
             type="password"
@@ -225,6 +229,7 @@ function Signup() {
             className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600"
           />
 
+          {/* Submit */}
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded font-semibold"

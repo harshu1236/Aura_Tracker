@@ -135,4 +135,10 @@ public Assignment uploadAssignment(
     }
 
 
+    @GetMapping("/{id}/courses")
+    public List<Course> getCoursesByTeacherId(@PathVariable Long id) {
+        return teacherService.getCoursesByTeacherId(id);
+    }
+
+
 }

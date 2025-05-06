@@ -1,11 +1,13 @@
 package com.harshit.AuraTracker.Service;
 
 import com.harshit.AuraTracker.Repository.TeacherRepository;
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeacherServiceImpl implements TeacherService{
@@ -25,8 +27,12 @@ public class TeacherServiceImpl implements TeacherService{
 
     @Override
     public Teacher getTeacherById(Long teacherId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTeacherById'");
+        return teacherRepository.findById(teacherId).orElse(null);
+    }
+
+    @Override
+    public List<Course> getCoursesByTeacherId(Long teacherId) {
+        return teacherRepository.findCoursesByTeacherId(teacherId);
     }
 
     

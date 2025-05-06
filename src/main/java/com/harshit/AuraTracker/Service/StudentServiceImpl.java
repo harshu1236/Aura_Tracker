@@ -1,6 +1,7 @@
 package com.harshit.AuraTracker.Service;
 
 import com.harshit.AuraTracker.Repository.StudentRepository;
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,5 +47,10 @@ public class StudentServiceImpl implements StudentService {
             .getBody();
 
         return Integer.parseInt(claims.get("studentId").toString());
+    }
+
+    @Override
+    public List<Course> getCoursesByStudentId(Long studentId) {
+        return studentRepository.findCoursesByStudentId(studentId);
     }
 }
