@@ -1,8 +1,11 @@
 package com.harshit.AuraTracker.Service;
 
 import com.harshit.AuraTracker.Repository.StudentRepository;
+import com.harshit.AuraTracker.Repository.TeacherRepository;
 import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
+import com.harshit.AuraTracker.modal.Teacher;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -11,12 +14,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private TeacherRepository teacherRepo;
 
     @Override
     public Student createStudent(Student student) {
@@ -52,5 +59,18 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Course> getCoursesByStudentId(Long studentId) {
         return studentRepository.findCoursesByStudentId(studentId);
+    }
+
+    @Override
+    public List<Teacher> getTeachersForStudent(Integer studentId) {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) return null;
+
+        List<Long> courseIds = student.getCourses()
+                                      .stream()
+                                      .map(course -> course.getCourseId())
+                                      .collect(Collectors.toList());
+
+        return teacherRepo.findTeachersByCourseIds(courseIds);
     }
 }

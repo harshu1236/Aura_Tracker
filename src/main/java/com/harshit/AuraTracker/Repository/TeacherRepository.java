@@ -17,4 +17,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     // 🔽 Custom method to get courses by teacherId
     @Query("SELECT t.courses FROM Teacher t WHERE t.teacherId = :teacherId")
     List<Course> findCoursesByTeacherId(@Param("teacherId") Long teacherId);
+
+    @Query("SELECT DISTINCT t FROM Teacher t JOIN t.courses c WHERE c.courseId IN :courseIds")
+    List<Teacher> findTeachersByCourseIds(List<Long> courseIds);
 }

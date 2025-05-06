@@ -8,6 +8,8 @@ import com.harshit.AuraTracker.modal.Assignment;
 import com.harshit.AuraTracker.modal.AssignmentSubmission;
 import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
+import com.harshit.AuraTracker.modal.Teacher;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.*;
@@ -116,6 +118,11 @@ public class StudentController {
     @GetMapping("/{id}/courses")
     public List<Course> getCoursesByStudentId(@PathVariable Long id) {
         return studentService.getCoursesByStudentId(id);
+    }
+
+    @GetMapping("/{studentId}/teachers")
+    public List<Teacher> getTeachersForStudent(@PathVariable Integer studentId) {
+        return studentService.getTeachersForStudent(studentId);
     }
 
 }
