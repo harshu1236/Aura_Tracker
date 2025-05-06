@@ -23,10 +23,10 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-  
+
     try {
       let url = '';
-  
+
       if (role === 'student') {
         url = 'http://localhost:1211/api/auth/login';
       } else if (role === 'teacher') {
@@ -34,27 +34,25 @@ function Login() {
       } else if (role === 'admin') {
         url = 'http://localhost:1211/auth/admin/login';
       }
-  
+
       const response = await axios.post(url, formData, { withCredentials: true });
-  
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-  
+
         const userData = {
           ...(response.data.student || response.data.teacher || response.data.admin),
           role: role.toUpperCase()
         };
-  
+
         localStorage.setItem('user', JSON.stringify(userData));
-        // Redirect based on role after successful login
-        if (role === 'student') {
-          navigate('/home', { replace: true });
-        } else if (role === 'teacher') {
-          navigate('/teacher/home', { replace: true });
-        } else if (role === 'admin') {
-          // Redirect to the student page after successful admin login
-          navigate('/home', { replace: true });
+
+        // 🔽 Store teacherId separately
+        if (role === 'teacher' && response.data.teacher) {
+          localStorage.setItem('teacherId', response.data.teacher.teacherId);
         }
+
+        navigate('/home', { replace: true });
       } else {
         setError(response.data.message || 'Login failed. Please check your credentials.');
       }
@@ -62,6 +60,7 @@ function Login() {
       setError(err.response?.data?.message || 'An error occurred during login');
     }
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700">

@@ -5,6 +5,7 @@ import com.harshit.AuraTracker.Repository.CourseRepository;
 import com.harshit.AuraTracker.Service.TeacherService;
 import com.harshit.AuraTracker.modal.Assignment;
 import com.harshit.AuraTracker.modal.Course;
+import com.harshit.AuraTracker.modal.Student;
 import com.harshit.AuraTracker.modal.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -132,6 +133,17 @@ public Assignment uploadAssignment(
     @GetMapping("/courses/{courseId}/assignments")
     public List<Assignment> getAssignmentsByCourse(@PathVariable Long courseId) {
         return assignmentRepo.findByCourses_CourseId(courseId);
+    }
+
+
+    @GetMapping("/{id}/courses")
+    public List<Course> getCoursesByTeacherId(@PathVariable Long id) {
+        return teacherService.getCoursesByTeacherId(id);
+    }
+
+    @GetMapping("/{teacherId}/students")
+    public List<Student> getStudentsByTeacher(@PathVariable Long teacherId) {
+        return teacherService.getStudentsForTeacher(teacherId);
     }
 
 

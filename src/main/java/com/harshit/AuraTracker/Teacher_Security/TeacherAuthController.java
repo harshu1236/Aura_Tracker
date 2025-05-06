@@ -1,13 +1,20 @@
 package com.harshit.AuraTracker.Teacher_Security;
 
+import com.harshit.AuraTracker.Repository.CourseRepository;
 import com.harshit.AuraTracker.Repository.TeacherRepository;
 import com.harshit.AuraTracker.Service.TeacherService;
 import com.harshit.AuraTracker.Security.JwtTokenProvider;
 import com.harshit.AuraTracker.Teacher_Security.AuthResponseForTeacher;
+import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Teacher;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.harshit.AuraTracker.dto.TeacherSignupRequest;
 
 @RestController
 @RequestMapping("/auth/teacher")
@@ -26,26 +33,42 @@ public class TeacherAuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CourseRepository courseRepository;;
+
     // Signup API
     @PostMapping("/signup")
-    public AuthResponseForTeacher signup(@RequestBody Teacher signupRequest) {
-        // Check if teacher already exists with this email
-        if (teacherRepository.findByEmail(signupRequest.getEmail()) != null) {
-            return new AuthResponseForTeacher(null, "Email already exists", null);
-        }
-
-        // Encode the password securely
-        signupRequest.setPassword(passwordEncoder.encode(signupRequest.getPassword().trim()));
-
-        // Save the teacher in the database
-        Teacher savedTeacher = teacherService.createTeacher(signupRequest);
-
-        // Generate the token
-        String token = jwtTokenProvider.generateToken(savedTeacher.getEmail());
-
-        // Return response with token, message and teacher details
-        return new AuthResponseForTeacher(token, "Signup Successful", savedTeacher);
+public AuthResponseForTeacher signup(@RequestBody TeacherSignupRequest signupRequest) {
+    if (teacherRepository.findByEmail(signupRequest.getEmail()) != null) {
+        return new AuthResponseForTeacher(null, "Email already exists", null);
     }
+
+    // Validate course combination
+    Optional<Course> courseOpt = courseRepository.findByCourseTypeAndCourseBranchAndSemester(
+            signupRequest.getCourseType().trim(),
+            signupRequest.getCourseBranch().trim(),
+            signupRequest.getSemester());
+
+    if (!courseOpt.isPresent()) {
+        return new AuthResponseForTeacher(null, "Invalid course details. Please choose from available options.", null);
+    }
+
+    Course course = courseOpt.get();
+
+    Teacher teacher = new Teacher();
+    teacher.setName(signupRequest.getName());
+    teacher.setEmail(signupRequest.getEmail());
+    teacher.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+    teacher.setSemester(signupRequest.getSemester());
+    teacher.setCourses(List.of(course));  // link the course
+
+    Teacher savedTeacher = teacherRepository.save(teacher);
+
+    String token = jwtTokenProvider.generateToken(savedTeacher.getEmail());
+
+    return new AuthResponseForTeacher(token, "Signup Successful", savedTeacher);
+}
+
 
     // Login API
     @PostMapping("/login")

@@ -1,6 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +16,7 @@ public class Teacher {
     private String name;
     private String email;
     private String password;
+    private int semester;
 
     // @ManyToOne
     // @JoinColumn(name = "courseId")
@@ -24,11 +25,10 @@ public class Teacher {
 
     @ManyToMany
     @JoinTable(
-    name = "teacherCourse",
-    joinColumns = @JoinColumn(name = "teacherId"),
-    inverseJoinColumns = @JoinColumn(name = "courseId"))
+    name = "teacher_course",
+    joinColumns = @JoinColumn(name = "teacher_id"),
+    inverseJoinColumns = @JoinColumn(name = "course_id"))
     private List<Course> courses;
-
 
     public Teacher() {
     }
