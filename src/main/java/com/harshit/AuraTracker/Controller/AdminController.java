@@ -34,10 +34,6 @@ public class AdminController {
         Course updatedCourse = adminService.assignTeacherToCourseByName(courseName, teacherName);
         return ResponseEntity.ok(updatedCourse);
     }
-
-
-
-
      @PostMapping("/create")
     public Course createCourse(@RequestBody Course course) throws Exception {
         return adminService.createCourse(course);

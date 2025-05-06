@@ -1,6 +1,4 @@
 package com.harshit.AuraTracker.modal;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 

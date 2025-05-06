@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aura-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tracker  
+    ports:
+      - "3306:3306"
+    networks:
+      - aura-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  aura-tracker:
+    build:
+      context: .  # This assumes you have a Dockerfile in the current directory
+    container_name: aura-tracker
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "1211:1211"
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_DATASOURCE_URL: jdbc:mysql://aura-mysql:3306/tracker  # Update with the correct MySQL URL
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root  
+    networks:
+      - aura-network
+  frontend:
+    build:
+      context: ./aura-tracker-frontend
+      dockerfile: Dockerfile
+    container_name: aura-frontend
+    ports:
+      - "3000:80"       # Host port 3000 → container’s nginx:80
+    networks:
+      - aura-network
+
+volumes:
+  mysql_data:
+
+networks:
+  aura-network:
+    driver: bridge

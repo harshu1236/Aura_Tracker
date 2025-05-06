@@ -30,7 +30,7 @@ public class AdminServiceImpl implements AdminService{
         Course course = courseRepo.findByCourseName(courseName)
                 .orElseThrow(() -> new Exception("Course not found with name: " + courseName));
 
-        Teacher teacher = teacherRepo.findByName(teacherName)
+        Teacher teacher = teacherRepo.findByName(teacherName) 
                 .orElseThrow(() -> new Exception("Teacher not found with name: " + teacherName));
 
         

@@ -211,6 +211,13 @@ function Signup() {
           >
             Sign Up
           </button>
+          <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="w-full text-indigo-300 mt-2 hover:underline text-sm"
+            >
+              Don’t have an account? Log In
+            </button>
         </form>
       </div>
     </div>

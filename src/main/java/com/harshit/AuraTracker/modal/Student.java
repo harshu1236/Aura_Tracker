@@ -1,6 +1,6 @@
 package com.harshit.AuraTracker.modal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -34,9 +34,9 @@ public class Student {
 
     @ManyToMany
     @JoinTable(
-    name = "student_course",
-    joinColumns = @JoinColumn(name = "student_id"),
-    inverseJoinColumns = @JoinColumn(name = "course_id"))
+    name = "studentCourse",
+    joinColumns = @JoinColumn(name = "studentId"),
+    inverseJoinColumns = @JoinColumn(name = "courseId"))
     private List<Course> courses;
 
 
