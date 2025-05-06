@@ -9,12 +9,17 @@ const TeacherShowingStudent = () => {
   const teacherId = user?.teacherId; // Now this will fetch the teacherId from the user object
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    const teacherId = user?.teacherId;
+  
     if (user?.role?.toLowerCase() === 'teacher' && teacherId && token) {
-      fetchStudents();  // Proceed only if the teacherId and role are correct
+      fetchStudents(teacherId, token);
     } else {
       setError('You must be logged in as a teacher.');
     }
-  }, [user, token, teacherId]);  // Ensure dependencies are correct to re-trigger when needed
+  }, []);
+   // Ensure dependencies are correct to re-trigger when needed
 
   const fetchStudents = () => {
     fetch(`http://localhost:1211/api/teacher/${teacherId}/students`, {

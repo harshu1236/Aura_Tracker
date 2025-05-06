@@ -5,8 +5,9 @@ const StudentShowingTeacher = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const studentId = localStorage.getItem('studentId');
     const user = JSON.parse(localStorage.getItem('user'));
+const studentId = user?.studentId;
+
 
     if (studentId && user?.role === 'STUDENT') {
       fetchTeachers(studentId);
