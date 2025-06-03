@@ -1,22 +1,31 @@
 package com.harshit.AuraTracker.Controller;
 
 import com.harshit.AuraTracker.Repository.AssignmentRepository;
-import com.harshit.AuraTracker.Repository.AssignmentSubmissionRepository;
+
 import com.harshit.AuraTracker.Repository.StudentRepository;
+import com.harshit.AuraTracker.Repository.StudentSubmissionRepository;
 import com.harshit.AuraTracker.Service.StudentService;
 import com.harshit.AuraTracker.modal.Assignment;
-import com.harshit.AuraTracker.modal.AssignmentSubmission;
+
 import com.harshit.AuraTracker.modal.Course;
 import com.harshit.AuraTracker.modal.Student;
+import com.harshit.AuraTracker.modal.StudentSubmission;
 import com.harshit.AuraTracker.modal.Teacher;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +41,13 @@ public class StudentController {
     @Autowired
     private AssignmentRepository assignmentRepo;
 
-    @Autowired
-    private AssignmentSubmissionRepository submissionRepo;
+   
     
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private StudentSubmissionRepository studentSubmissionRepo;
 
     // Endpoint to create a new student
     @PostMapping("/add")
@@ -61,59 +72,10 @@ public class StudentController {
     }
 
     // Endpoint to submit an assignment
-    @PostMapping("/assignments/{assignmentId}/submit")
-    public AssignmentSubmission submitAssignment(
-            @PathVariable Long assignmentId,
-            @RequestParam("studentId") Long studentId,
-            @RequestParam("file") MultipartFile file) throws Exception {
-        
-        Assignment assignment = assignmentRepo.findById(assignmentId)
-                .orElseThrow(() -> new Exception("Assignment not found"));
-
-        Student student = studentRepository.findById(studentId.intValue())
-                .orElseThrow(() -> new Exception("Student not found"));
-
-        // Ensure the directory exists: Aura_Tracker/submissions
-        String uploadDir = System.getProperty("user.dir") + File.separator + "Aura_Tracker" + File.separator + "submissions";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        // Save file to submissions folder
-        String filePath = uploadDir + File.separator + file.getOriginalFilename();
-        file.transferTo(new File(filePath));
-
-        // Save metadata to database (if needed)
-        AssignmentSubmission submission = new AssignmentSubmission();
-        submission.setAssignment(assignment);
-        submission.setStudent(student);
-        submission.setSubmittedFileUrl(filePath);
-
-        return submissionRepo.save(submission);
-    }
+    
 
     // Endpoint to download a student's submission for an assignment
-    @GetMapping("/assignments/{assignmentId}/submission")
-    public InputStreamResource downloadMySubmission(
-            @PathVariable Long assignmentId,
-            @RequestHeader("Authorization") String authHeader) throws Exception {
-
-        // Extract studentId from JWT token
-        String token = authHeader.replace("Bearer ", "");
-        Integer studentId = studentService.extractStudentIdFromToken(token);
-
-        AssignmentSubmission submission = submissionRepo
-                .findByAssignment_IdAndStudent_StudentId(assignmentId, studentId.longValue())
-                .orElseThrow(() -> new Exception("Submission not found"));
-
-        File file = new File(submission.getSubmittedFileUrl());
-        if (!file.exists()) {
-            throw new FileNotFoundException("File not found");
-        }
-
-        return new InputStreamResource(new FileInputStream(file));
-    }
+    
 
     @GetMapping("/{id}/courses")
     public List<Course> getCoursesByStudentId(@PathVariable Long id) {
@@ -124,5 +86,84 @@ public class StudentController {
     public List<Teacher> getTeachersForStudent(@PathVariable Integer studentId) {
         return studentService.getTeachersForStudent(studentId);
     }
+
+
+    @GetMapping("/{studentId}/courses/{courseId}/assignments")
+public ResponseEntity<?> getAssignmentsForCourse(
+        @PathVariable Long studentId,
+        @PathVariable Long courseId) {
+
+    Student student = studentRepository.findByStudentId(studentId).orElseThrow();
+    boolean enrolled = student.getCourses().stream().anyMatch(c -> c.getCourseId().equals(courseId));
+    if (!enrolled) return ResponseEntity.status(403).body("You are not enrolled in this course.");
+
+    List<Assignment> assignments = assignmentRepo.findByCourses_CourseId(courseId);
+    return ResponseEntity.ok(assignments);
+}
+
+
+    @GetMapping("/assignment-file")
+public ResponseEntity<?> downloadAssignment(@RequestParam String fileUrl) throws FileNotFoundException {
+    File file = new File(fileUrl);
+    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+    return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=" + file.getName())
+            .body(resource);
+}
+
+    @Value("${file.submission-dir}")
+private String submissionDir;
+
+@PostMapping("/{studentId}/assignments/{assignmentId}/submit")
+public ResponseEntity<?> submitAssignment(
+        @PathVariable Long studentId,
+        @PathVariable Long assignmentId,
+        @RequestParam("file") MultipartFile file) {
+
+    try {
+        Student student = studentRepository.findByStudentId(studentId).orElseThrow();
+        Assignment assignment = assignmentRepo.findById(assignmentId).orElseThrow();
+
+        // Check enrollment
+        boolean enrolled = student.getCourses().stream()
+                .anyMatch(c -> c.getCourseId().equals(assignment.getCourses().getCourseId()));
+        if (!enrolled) {
+            return ResponseEntity.status(403).body("Not enrolled in this course.");
+        }
+
+        // Ensure directory exists
+        Path dirPath = Paths.get(submissionDir);
+        if (!Files.exists(dirPath)) {
+            Files.createDirectories(dirPath);
+        }
+
+        // Create file path
+        String filename = file.getOriginalFilename();
+        Path filePath = dirPath.resolve(filename);
+
+        // Save file
+        file.transferTo(filePath.toFile());
+
+        // Create submission entry
+        StudentSubmission submission = new StudentSubmission();
+        submission.setAssignment(assignment);
+        submission.setStudent(student);
+        submission.setFileUrl(filePath.toString()); // Save absolute or relative path
+        submission.setSubmissionDate(LocalDate.now());
+
+        studentSubmissionRepo.save(submission);
+
+        return ResponseEntity.ok("Submitted successfully.");
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).body("File upload failed.");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).body("Submission failed.");
+    }
+}
+
+
 
 }
