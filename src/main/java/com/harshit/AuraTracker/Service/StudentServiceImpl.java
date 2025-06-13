@@ -37,7 +37,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Optional<Student> getStudentDataById(Integer studentId) {
+    public Optional<Student> getStudentDataById(Long studentId) {
         return studentRepository.findById(studentId);
     }
 
@@ -62,7 +62,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Teacher> getTeachersForStudent(Integer studentId) {
+    public List<Teacher> getTeachersForStudent(Long studentId) {
         Student student = studentRepository.findById(studentId).orElse(null);
         if (student == null) return null;
 
@@ -72,5 +72,11 @@ public class StudentServiceImpl implements StudentService {
                                       .collect(Collectors.toList());
 
         return teacherRepo.findTeachersByCourseIds(courseIds);
+    }
+
+     @Override
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
     }
 }

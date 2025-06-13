@@ -13,6 +13,7 @@ import Assignment from './components/assignment/Assignment';
 import AdminCourseManager from './components/admin/AdmisCourseManager';
 import StudentShowingTeacher from './components/student/studentshowingTeacher';
 import TeacherShowingStudent from './components/teacher/teachershowingStudent';
+import StartDuel from './components/compete/StartDuel';
 
 const theme = createTheme({
   palette: {
@@ -49,6 +50,7 @@ function App() {
               <Route path="/student/teachers" element={<StudentShowingTeacher />} />
               <Route path="/assignments" element={<Assignment />} />
               <Route path="/admin/courses" element={<AdminCourseManager />} />
+              <Route path="/student/compete" element={<StartDuel />} />
             </Route>
           </Routes>
         </div>

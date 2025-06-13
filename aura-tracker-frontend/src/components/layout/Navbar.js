@@ -38,6 +38,9 @@ function Navbar() {
                 <Button color="inherit" component={Link} to="/student/teachers">
                   Teacher
                 </Button>
+                <Button color="inherit" component={Link} to="/student/compete">
+                  Compete
+                </Button>
               </>
             )}
 

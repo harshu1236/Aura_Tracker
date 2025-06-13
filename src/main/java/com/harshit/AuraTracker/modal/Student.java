@@ -1,8 +1,8 @@
 package com.harshit.AuraTracker.modal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 
 import jakarta.persistence.*;
@@ -32,6 +32,8 @@ public class Student {
     private int points;
 
     private int semester;
+
+    private String codeforcesHandle;
 
     @ManyToMany
     @JoinTable(
@@ -107,5 +109,12 @@ public class Student {
         this.semester = semester;
     }
 
+    public String getCodeforcesHandle() {
+        return codeforcesHandle;
+    }
+
+    public void setCodeforcesHandle(String codeforcesHandle) {
+        this.codeforcesHandle = codeforcesHandle;
+    }
     
 }

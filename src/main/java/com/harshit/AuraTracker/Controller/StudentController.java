@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 
 @RestController
 @RequestMapping("/api/std")
@@ -57,7 +57,7 @@ public class StudentController {
 
     // Endpoint to fetch student by ID
     @GetMapping("{id}")
-    public Optional<Student> getStudentById(@PathVariable Integer id) throws Exception {
+    public Optional<Student> getStudentById(@PathVariable Long id) throws Exception {
         Optional<Student> studentDataById = studentService.getStudentDataById(id);
         if (!studentDataById.isPresent()) {
             throw new Exception("Student is not registered with ID " + id);
@@ -83,7 +83,7 @@ public class StudentController {
     }
 
     @GetMapping("/{studentId}/teachers")
-    public List<Teacher> getTeachersForStudent(@PathVariable Integer studentId) {
+    public List<Teacher> getTeachersForStudent(@PathVariable Long studentId) {
         return studentService.getTeachersForStudent(studentId);
     }
 

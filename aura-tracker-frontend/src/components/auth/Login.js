@@ -47,11 +47,12 @@ function Login() {
 
         localStorage.setItem('user', JSON.stringify(userData));
 
-        // 🔽 Store teacherId separately
+      // 🔽 Store teacherId or studentId separately
         if (role === 'teacher' && response.data.teacher) {
           localStorage.setItem('teacherId', response.data.teacher.teacherId);
+        } else if (role === 'student' && response.data.student) {
+          localStorage.setItem('studentId', response.data.student.studentId);
         }
-
         navigate('/home', { replace: true });
       } else {
         setError(response.data.message || 'Login failed. Please check your credentials.');

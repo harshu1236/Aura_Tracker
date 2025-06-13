@@ -13,7 +13,7 @@ public class GamificationServiceImpl implements GamificationService{
     @Autowired
     private StudentRepository studentRepository;
 
-    public Student addPoints(int studentId, int points) throws Exception {
+    public Student addPoints(Long studentId, int points) throws Exception {
         Optional<Student> student = studentRepository.findById(studentId);
         if (student.isPresent()) {
             Student st = student.get();
