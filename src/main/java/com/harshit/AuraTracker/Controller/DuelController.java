@@ -27,7 +27,8 @@ public class DuelController {
     public Compete startDuel(@RequestBody DuelRequest duelRequest) {
     Student challenger = studentService.getStudentById(duelRequest.getChallengerId());
     Student opponent = studentService.getStudentById(duelRequest.getOpponentId());
-
+        System.out.println(challenger.getRegNo());
+        System.out.println(opponent.getRegNo());
     return competeService.startDuel(challenger, opponent, duelRequest.getDuration());
 }
 

@@ -5,10 +5,13 @@ import { useNavigate } from 'react-router-dom';
 function StartDuel() {
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [search, setSearch] = useState('');
   const [opponentId, setOpponentId] = useState('');
-  const [duration, setDuration] = useState(30); // default 30 mins
+  const [duration, setDuration] = useState(30);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const studentId = localStorage.getItem('studentId');
 
@@ -17,9 +20,20 @@ function StartDuel() {
       .then(res => {
         const others = res.data.filter(s => s.studentId.toString() !== studentId);
         setStudents(others);
+        setFilteredStudents(others);
       })
       .catch(() => setError('Failed to load students.'));
   }, [studentId]);
+
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearch(term);
+    setFilteredStudents(
+      students.filter(s =>
+        s.name.toLowerCase().includes(term) || s.regNo.toLowerCase().includes(term)
+      )
+    );
+  };
 
   const startDuel = () => {
     setError('');
@@ -30,16 +44,24 @@ function StartDuel() {
       return;
     }
 
-    axios.post('http://localhost:1211/api/duel/start', {
+    if (duration < 5 || duration > 180) {
+      setError('Duration must be between 5 and 180 minutes.');
+      return;
+    }
+
+    setLoading(true);
+    axios.post('http://localhost:1211/api/duels/start', {
       challengerId: studentId,
       opponentId,
       duration
     }).then(res => {
       setSuccess('Duel started successfully!');
-      navigate(`/student/duel/${res.data.id}`); // adjust based on actual route
+      setTimeout(() => {
+        navigate(`/student/duel/${res.data.id}`);
+      }, 1000);
     }).catch(err => {
       setError(err.response?.data?.message || 'Failed to start duel.');
-    });
+    }).finally(() => setLoading(false));
   };
 
   return (
@@ -50,14 +72,22 @@ function StartDuel() {
       {success && <div className="bg-green-600 p-2 rounded mb-3">{success}</div>}
 
       <div className="mb-4">
-        <label className="block mb-1">Select Opponent:</label>
+        <label className="block mb-1">Search Opponent:</label>
+        <input
+          type="text"
+          placeholder="Type name or Reg No..."
+          value={search}
+          onChange={handleSearch}
+          className="w-full p-2 mb-2 bg-gray-700 rounded"
+        />
+
         <select
           className="w-full p-2 bg-gray-700 rounded"
           value={opponentId}
           onChange={(e) => setOpponentId(e.target.value)}
         >
-          <option value="">-- Choose --</option>
-          {students.map((s) => (
+          <option value="">-- Select Opponent --</option>
+          {filteredStudents.map((s) => (
             <option key={s.studentId} value={s.studentId}>
               {s.name} ({s.regNo})
             </option>
@@ -72,16 +102,17 @@ function StartDuel() {
           min={5}
           max={180}
           value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+          onChange={(e) => setDuration(Number(e.target.value))}
           className="w-full p-2 bg-gray-700 rounded"
         />
       </div>
 
       <button
         onClick={startDuel}
-        className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded"
+        disabled={loading}
+        className={`bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded ${loading && 'opacity-60 cursor-not-allowed'}`}
       >
-        Start Duel
+        {loading ? 'Starting...' : 'Start Duel'}
       </button>
     </div>
   );

@@ -14,6 +14,10 @@ import AdminCourseManager from './components/admin/AdmisCourseManager';
 import StudentShowingTeacher from './components/student/studentshowingTeacher';
 import TeacherShowingStudent from './components/teacher/teachershowingStudent';
 import StartDuel from './components/compete/StartDuel';
+import DuelRoom from './components/compete/DuelRoom';
+import MyDuels from './components/compete/MyDuels';
+import OngoingDuels from './components/compete/OngoingDuels';
+import CompletedDuels from './components/compete/CompletedDuels';
 
 const theme = createTheme({
   palette: {
@@ -51,6 +55,13 @@ function App() {
               <Route path="/assignments" element={<Assignment />} />
               <Route path="/admin/courses" element={<AdminCourseManager />} />
               <Route path="/student/compete" element={<StartDuel />} />
+              <Route path="/student/duel/:duelId" element={<DuelRoom />} />
+              <Route path="/student/duel/:duelId" element={<DuelRoom />} />
+              <Route path="/student/my-duels" element={<MyDuels />} />
+              <Route path="/duels/start" element={<StartDuel />} />
+              <Route path="/duels/ongoing" element={<OngoingDuels />} />
+              <Route path="/duels/completed" element={<CompletedDuels />} />
+
             </Route>
           </Routes>
         </div>
